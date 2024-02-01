@@ -9,6 +9,20 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "X-Server.Networking", "X-Se
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "X-Server.Logging", "X-Server.Logging\X-Server.Logging.vcxproj", "{9AB30718-7321-4096-A991-D43DDDF50B00}"
 EndProject
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "X-Plane", "E:\X-Plane 11\X-Plane.exe", "{F5FFA3F2-72E1-4F27-ACB3-D76EA180EC1F}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = E:\X-Plane 11\X-Plane.exe
+		RemoteMachine = ZOIDBERG
+		StartingDirectory = E:\X-Plane 11
+		Environment = Default
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		UseLegacyDebugEngines = No
+		LaunchSQLEngine = No
+		AttachLaunchAction = No
+		IORedirection = Auto
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +55,10 @@ Global
 		{9AB30718-7321-4096-A991-D43DDDF50B00}.Release|x64.Build.0 = Release|x64
 		{9AB30718-7321-4096-A991-D43DDDF50B00}.Release|x86.ActiveCfg = Release|Win32
 		{9AB30718-7321-4096-A991-D43DDDF50B00}.Release|x86.Build.0 = Release|Win32
+		{F5FFA3F2-72E1-4F27-ACB3-D76EA180EC1F}.Debug|x64.ActiveCfg = Release|x64
+		{F5FFA3F2-72E1-4F27-ACB3-D76EA180EC1F}.Debug|x86.ActiveCfg = Release|x64
+		{F5FFA3F2-72E1-4F27-ACB3-D76EA180EC1F}.Release|x64.ActiveCfg = Release|x64
+		{F5FFA3F2-72E1-4F27-ACB3-D76EA180EC1F}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -23,7 +23,6 @@
 static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter);
 static float BeaconCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter);
 static float RunCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter);
-static float ResponseCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter);
 static void	MenuHandlerCallback(void* inMenuRef, void* inItemRef);
 
 std::map<int, IPInfo> IPMap;
@@ -41,8 +40,8 @@ static XPLMMenuID eSkyInstructorMenu;
 
 PLUGIN_API int XPluginStart(char* outName, char* outSig, char* outDesc)
 {
-	std::string name = "XInstrutor";
-	std::string sig = "rdessart.XInstrutor.Connector";
+	std::string name = "XServer";
+	std::string sig = "rdessart.XServer.Connector";
 	std::string description = "X-Server connector for X-Plane";
 
 #ifdef IBM
@@ -54,10 +53,10 @@ PLUGIN_API int XPluginStart(char* outName, char* outSig, char* outDesc)
 	strcpy(outSig, sig.c_str());
 	strcpy(outDesc, description.c_str());
 #endif
-	eSkyInstructorMenu = XPLMCreateMenu("eSkyInstructor", nullptr, 0, MenuHandlerCallback, 0);
+	eSkyInstructorMenu = XPLMCreateMenu("X-Server", nullptr, 0, MenuHandlerCallback, 0);
 	if (eSkyInstructorMenu == NULL)
 	{
-		logger.Log("Unable to create eSkyInstructor Submenu");
+		logger.Log("Unable to create X-Server Submenu");
 	}
 	XPLMCreateFlightLoop_t initalizerParameter;
 	initalizerParameter.structSize = sizeof(XPLMCreateFlightLoop_t);
@@ -151,27 +150,21 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 	MasterCallbackParameter* callbackParam = new MasterCallbackParameter();
 	callbackParam->DatarefManager = manager;
 	callbackParam->Server = &server;
+	callbackParam->Logger = new Logger("X-Server.log", "CALLBACK", false);
 
 	if (!manager->isFF320Api())
 	{
-		//XPLMCreateFlightLoop_t callbackParameter;
-		//callbackParameter.structSize = sizeof(XPLMCreateFlightLoop_t);
-		//callbackParameter.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
-		//callbackParameter.refcon = nullptr;
-		//callbackParameter.callbackFunc = RunCallback;
-		//XPLMFlightLoopID callbackId = XPLMCreateFlightLoop(&callbackParameter);
-		//XPLMScheduleFlightLoop(callbackId, -1.0f, 1);
-		XPLMRegisterFlightLoopCallback(RunCallback, -1.0f, callbackParam);
+		XPLMCreateFlightLoop_t masterCallback;
+		masterCallback.structSize = sizeof(XPLMCreateFlightLoop_t);
+		masterCallback.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
+		masterCallback.refcon = callbackParam;
+		masterCallback.callbackFunc = RunCallback;
+		XPLMFlightLoopID callbackId = XPLMCreateFlightLoop(&masterCallback);
+		XPLMScheduleFlightLoop(callbackId, -1.0f, 1);
 	}
-
-	XPLMCreateFlightLoop_t respCallbackParameter;
-	respCallbackParameter.structSize = sizeof(XPLMCreateFlightLoop_t);
-	respCallbackParameter.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
-	respCallbackParameter.refcon = nullptr;
-	respCallbackParameter.callbackFunc = ResponseCallback;
-	XPLMFlightLoopID respCallbackId = XPLMCreateFlightLoop(&respCallbackParameter);
-	XPLMScheduleFlightLoop(respCallbackId, -1.0f, 1);
-
+	else {
+		manager->BindFlightFactorApiCallback(callbackParam);
+	}
 	return 0;
 }
 
@@ -185,18 +178,8 @@ float RunCallback(float elapsed, float elpasedFlightLoop, int counter, void* ref
 	//DEBUG
 	MasterCallbackParameter* parameters = (MasterCallbackParameter*)refcounter;
 	//!DEBUG
-	//Callback(0.0, parameters);
+	Callback(0.0, parameters);
 	return -1.0f;
-}
-
-
-static float ResponseCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter)
-{
-	while (manager->GetMessageOutQueueLenght() > 0)
-	{
-		server.SendMessage(manager->GetNextMessageOut());
-	}
-	return 0.1f;
 }
 
 static float BeaconCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter)
