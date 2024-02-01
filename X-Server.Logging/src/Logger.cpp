@@ -1,3 +1,5 @@
+
+#include <XPLM/XPLMUtilities.h>
 #include "../include/Logger.h"
 
 Logger::Logger() : m_logfile(nullptr), m_module("")

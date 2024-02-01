@@ -5,7 +5,6 @@
 #include <fstream>
 #include <sstream>
 #include <ctime>
-#include <XPLM/XPLMUtilities.h>
 
 class Logger
 {
