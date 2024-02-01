@@ -2,11 +2,13 @@
 #include <UDPServer.h>
 
 #include "XPlaneManagers/DatarefManager.h"
+#include "XPlaneManagers/FlightLoopManager.h"
 
 struct MasterCallbackParameter 
 {
     UDPServer* Server;
     class DatarefManager* DatarefManager;
+    class FlightLoopManager* FlightLoopManager;
     Logger* Logger;
 };
 
@@ -22,6 +24,8 @@ void SetRegisteredDatarefOperation(Message& message, MasterCallbackParameter* pa
 void GetRegisteredDatarefOperation(Message& message, MasterCallbackParameter* parameters);
 void GetDatarefInfoOperation(Message& message, MasterCallbackParameter* parameters);
 void GetRegisteredDatarefInfoOperation(Message& message, MasterCallbackParameter* parameters);
+void RegisterFlightLoopOperation(Message& m, MasterCallbackParameter* parameters);
+void SubscribeDatarefOperation(Message& m, MasterCallbackParameter* parameters);
 
 struct CallbackOperations
 {
@@ -37,6 +41,8 @@ struct CallbackOperations
             { "getregdata", GetRegisteredDatarefOperation },
             { "datarefinfo", GetDatarefInfoOperation },
             { "regdatarefinfo", GetRegisteredDatarefInfoOperation },
+            { "regflightloop", RegisterFlightLoopOperation },
+            { "subdataref", SubscribeDatarefOperation },
         };
     };
 

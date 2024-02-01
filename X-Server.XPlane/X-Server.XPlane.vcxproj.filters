@@ -36,6 +36,9 @@
     <ClCompile Include="Sources\MasterCallback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\XPlaneManagers\FlightLoopManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Tools\SharedValue.h">
@@ -60,6 +63,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sources\MasterCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\XPlaneManagers\FlightLoopManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

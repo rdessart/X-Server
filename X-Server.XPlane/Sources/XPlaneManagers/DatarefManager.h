@@ -20,6 +20,7 @@
 #include "../MasterCallback.h"
 
 using json = nlohmann::json;
+typedef std::pair<std::string, AbstractDataref*> NamedDataref;
 
 class DatarefManager {
 /// <summary>

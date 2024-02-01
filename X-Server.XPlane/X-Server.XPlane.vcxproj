@@ -176,6 +176,7 @@
     <ClCompile Include="Sources\main.cpp" />
     <ClCompile Include="Sources\MasterCallback.cpp" />
     <ClCompile Include="Sources\Tools\Utils.cpp" />
+    <ClCompile Include="Sources\XPlaneManagers\FlightLoopManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Callbacks.h" />
@@ -186,6 +187,7 @@
     <ClInclude Include="Sources\MasterCallback.h" />
     <ClInclude Include="Sources\Tools\SharedValue.h" />
     <ClInclude Include="Sources\Tools\Utils.h" />
+    <ClInclude Include="Sources\XPlaneManagers\FlightLoopManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

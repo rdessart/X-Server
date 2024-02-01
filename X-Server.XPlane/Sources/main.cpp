@@ -16,6 +16,7 @@
 #include <XPLM/XPLMMenus.h>
 
 #include "XPlaneManagers/DatarefManager.h"
+#include "XPlaneManagers/FlightLoopManager.h"
 
 #include "Datarefs/Dataref.h"
 #include <UDPBeacon.h>
@@ -36,7 +37,10 @@ static UDPServer server;
 static std::string AcfAuthor;
 static std::string AcfDescription;
 static int SimVersion, SDKVersion;
-DatarefManager* manager;
+
+DatarefManager* datarefManager;
+FlightLoopManager* flightLoopManager;
+
 static XPLMMenuID eSkyInstructorMenu;
 
 PLUGIN_API int XPluginStart(char* outName, char* outSig, char* outDesc)
@@ -136,8 +140,8 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 	int res = beacon.Initalize();
 	logger.Log("UDP Beacon initalizer returned " + std::to_string(res));
 	XPLMScheduleFlightLoop(beaconCallbackId, -1, 0);
-	manager = new DatarefManager(true); // ? we force the system to try to initalise FFAPI by default ? TODO:Check if necessary
-
+	datarefManager = new DatarefManager(true); // ? we force the system to try to initalise FFAPI by default ? TODO:Check if necessary
+	flightLoopManager = new FlightLoopManager();
 
 	res = server.Initalize();
 	logger.Log("UDP Server initalizer returned " + std::to_string(res));
@@ -149,11 +153,12 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 		});
 
 	MasterCallbackParameter* callbackParam = new MasterCallbackParameter();
-	callbackParam->DatarefManager = manager;
+	callbackParam->DatarefManager = datarefManager;
 	callbackParam->Server = &server;
+	callbackParam->FlightLoopManager = flightLoopManager;
 	callbackParam->Logger = new Logger("X-Server.log", "CALLBACK", false);
 
-	if (!manager->isFF320Api())
+	if (!datarefManager->isFF320Api())
 	{
 		XPLMCreateFlightLoop_t masterCallback;
 		masterCallback.structSize = sizeof(XPLMCreateFlightLoop_t);
@@ -164,7 +169,7 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 		XPLMScheduleFlightLoop(callbackId, -1.0f, 1);
 	}
 	else {
-		manager->BindFlightFactorApiCallback(callbackParam);
+		datarefManager->BindFlightFactorApiCallback(callbackParam);
 	}
 	return 0;
 }
@@ -176,10 +181,7 @@ void SendBeacon(json message)
 
 float RunCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter)
 {
-	//DEBUG
-	MasterCallbackParameter* parameters = (MasterCallbackParameter*)refcounter;
-	//!DEBUG
-	Callback(0.0, parameters);
+	Callback(0.0, refcounter);
 	return -1.0f;
 }
 
