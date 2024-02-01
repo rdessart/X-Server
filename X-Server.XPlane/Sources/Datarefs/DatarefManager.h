@@ -1,31 +1,30 @@
 #pragma once
 
-#include "../Network/Message.h"
-
 #include <string>
 #include <vector>
 #include <map>
 #include <queue>
 #include <mutex>
 
+#include <UDPServer.h>
 #include <XPLM/XPLMProcessing.h>
 #include <XPLM/XPLMPlugin.h>
 #include <nlohmann/json.hpp>
+#include <Logger.h>
+#include <Message.h>
 
 #include "AbstractDataref.h"
 #include "FFA320Dataref.h"
 #include "Dataref.h"
 #include "../Tools/SharedValue.h"
-#include "../Tools/Logger.h"
 
 using json = nlohmann::json;
 
 void Callback(double step, void* tag);
 
-struct CallBackInfoStruct {
-    DatarefManager* manager;
-    int callbackTimeMs;
-    int callbackId;
+struct MasterCallbackParameter {
+    UDPServer* Server;
+    class DatarefManager* DatarefManager;
 };
 
 static void Callback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void* inRefcon);
@@ -33,19 +32,13 @@ static void Callback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastF
 class DatarefManager {
 public:
     DatarefManager(bool enableFlightFactorAPI=false);
-    //std::size_t AddDataref(std::string name, AbstractDataref* dataref);
-    //std::size_t AddDataref(std::string path,
-    //               std::string name, 
-    //               std::string conversionFactor = "1.0", 
-    //               Dataref::Type type = Dataref::Type::Unknown);
-
     AbstractDataref* GetDatarefByName(std::string name);
     void AddDatarefToMap(std::string name, AbstractDataref* dataref);
     void AddMessageToQueue(Message m);
 
-    void AddCallbackToMap(CallBackInfoStruct info);
-    void* GetCallbackFromMap();
-    int** GetAllCallbacks();
+    //void AddCallbackToMap(CallBackInfoStruct info);
+    //void* GetCallbackFromMap();
+    //int** GetAllCallbacks();
 
     Message GetNextMessage();
     std::size_t GetMessageQueueLenght();

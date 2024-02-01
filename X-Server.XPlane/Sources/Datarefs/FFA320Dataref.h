@@ -4,7 +4,7 @@
 #include "AbstractDataref.h"
 
 #include "../Tools/SharedValue.h"
-#include "../Tools/Logger.h"
+#include <Logger.h>
 #include "../Tools/Utils.h"
 
 class FFDataref :

@@ -8,7 +8,7 @@
 #include <XPLM/XPLMDataAccess.h>
 #include <XPLM/XPLMUtilities.h>
 
-#include "../Tools/Logger.h"
+#include <Logger.h>
 #include "../Tools/Utils.h"
 
 #include "AbstractDataref.h"

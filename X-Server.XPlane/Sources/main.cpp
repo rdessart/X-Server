@@ -17,8 +17,8 @@
 
 #include "Datarefs/DatarefManager.h"
 #include "Datarefs/Dataref.h"
-#include "Network/UDPBeacon.h"
-#include "Network/UDPServer.h"
+#include <UDPBeacon.h>
+#include <UDPServer.h>
 
 static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter);
 static float BeaconCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter);
@@ -136,28 +136,32 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 	int res = beacon.Initalize();
 	logger.Log("UDP Beacon initalizer returned " + std::to_string(res));
 	XPLMScheduleFlightLoop(beaconCallbackId, -1, 0);
-	manager = new DatarefManager(true);
+	manager = new DatarefManager(true); // ? we force the system to try to initalise FFAPI by default ? TODO:Check if necessary
+
 
 	res = server.Initalize();
 	logger.Log("UDP Server initalizer returned " + std::to_string(res));
 
-
-
 	auto futptr = std::make_shared<std::future<void>>();
 	*futptr = std::async(std::launch::async, [futptr]()
 		{
-			server.ReceiveMessage(manager);
+			server.ReceiveMessage();
 		});
+
+	MasterCallbackParameter* callbackParam = new MasterCallbackParameter();
+	callbackParam->DatarefManager = manager;
+	callbackParam->Server = &server;
+
 	if (!manager->isFF320Api())
 	{
-
-		XPLMCreateFlightLoop_t callbackParameter;
-		callbackParameter.structSize = sizeof(XPLMCreateFlightLoop_t);
-		callbackParameter.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
-		callbackParameter.refcon = nullptr;
-		callbackParameter.callbackFunc = RunCallback;
-		XPLMFlightLoopID callbackId = XPLMCreateFlightLoop(&callbackParameter);
-		XPLMScheduleFlightLoop(callbackId, -1.0f, 1);
+		//XPLMCreateFlightLoop_t callbackParameter;
+		//callbackParameter.structSize = sizeof(XPLMCreateFlightLoop_t);
+		//callbackParameter.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
+		//callbackParameter.refcon = nullptr;
+		//callbackParameter.callbackFunc = RunCallback;
+		//XPLMFlightLoopID callbackId = XPLMCreateFlightLoop(&callbackParameter);
+		//XPLMScheduleFlightLoop(callbackId, -1.0f, 1);
+		XPLMRegisterFlightLoopCallback(RunCallback, -1.0f, callbackParam);
 	}
 
 	XPLMCreateFlightLoop_t respCallbackParameter;
@@ -175,6 +179,16 @@ void SendBeacon(json message)
 {
 	beacon.SendMessage(message);
 }
+
+float RunCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter)
+{
+	//DEBUG
+	MasterCallbackParameter* parameters = (MasterCallbackParameter*)refcounter;
+	//!DEBUG
+	//Callback(0.0, parameters);
+	return -1.0f;
+}
+
 
 static float ResponseCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter)
 {
@@ -201,12 +215,6 @@ static float BeaconCallback(float elapsed, float elpasedFlightLoop, int counter,
 			SendBeacon(j);
 		});
 	return 1.0f;
-}
-
-float RunCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter)
-{
-	Callback(0.0, manager);
-	return -1.0f;
 }
 
 void MenuHandlerCallback(void* inMenuRef, void* inItemRef)
