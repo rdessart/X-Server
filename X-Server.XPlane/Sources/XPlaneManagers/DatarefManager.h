@@ -13,15 +13,21 @@
 #include <Logger.h>
 #include <Message.h>
 
-#include "AbstractDataref.h"
-#include "FFA320Dataref.h"
-#include "Dataref.h"
+#include "../Datarefs/AbstractDataref.h"
+#include "../Datarefs/FFA320Dataref.h"
+#include "../Datarefs/Dataref.h"
 #include "../Tools/SharedValue.h"
 #include "../MasterCallback.h"
 
 using json = nlohmann::json;
 
 class DatarefManager {
+/// <summary>
+/// This class goal is :
+///  - manage dataref operations (setters, getters).
+///  - manage dataref storage (register, unregister).
+///  - get information about dataref
+/// </summary>
 public:
     DatarefManager(bool enableFlightFactorAPI=false);
     AbstractDataref* GetDatarefByName(std::string name);

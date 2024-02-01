@@ -15,7 +15,8 @@
 #include <XPLM/XPLMUtilities.h>
 #include <XPLM/XPLMMenus.h>
 
-#include "Datarefs/DatarefManager.h"
+#include "XPlaneManagers/DatarefManager.h"
+
 #include "Datarefs/Dataref.h"
 #include <UDPBeacon.h>
 #include <UDPServer.h>

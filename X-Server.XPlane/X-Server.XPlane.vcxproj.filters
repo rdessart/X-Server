@@ -27,7 +27,7 @@
     <ClCompile Include="Sources\Datarefs\Dataref.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Datarefs\DatarefManager.cpp">
+    <ClCompile Include="Sources\XPlaneManagers\DatarefManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Callbacks.cpp">
@@ -53,7 +53,7 @@
     <ClInclude Include="Sources\Datarefs\Dataref.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Datarefs\DatarefManager.h">
+    <ClInclude Include="Sources\XPlaneManagers\DatarefManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Callbacks.h">
