@@ -34,3 +34,4 @@ win32\
 *.exe
 *.out
 *.app
+/X-Server.XPlane/x64/Debug
