@@ -35,3 +35,5 @@ win32\
 *.out
 *.app
 /X-Server.XPlane/x64/Debug
+/X-Server.Logging/x64/Debug
+/x64/Debug
