@@ -23,7 +23,8 @@ struct FlightLoopParameter {
 	Message ReturnMessage;
 };
 
-class FlightLoopManager {
+class FlightLoopManager 
+{
 /// <summary>
 /// This class goal is :
 ///  - create flightloop callback (setters, getters).
@@ -48,3 +49,8 @@ protected:
 	unsigned int RegisterFlightLoop(unsigned int deltaTime, bool isTimeReference, MasterCallbackParameter* mastercallback, const Message& message);
 	unsigned int UnregisterFlightLoop(unsigned int deltaTime, bool isTimeReference);
 };
+
+// TODO: As Callbacks are linked to the sender, we could juste use and uint as Id. Multiples recepients could have their own callbacks
+// TODO: Possibility to unreference flightloops
+// TODO: Possibility to unreference datarefs
+// TODO: Create a destructor to clean up the mess.
