@@ -1,3 +1,7 @@
+#user defined
+.vs
+x64\
+win32\
 # Prerequisites
 *.d
 
