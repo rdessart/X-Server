@@ -4,7 +4,7 @@
 
 #include "IServer.h"
 #include "NetworkUtils.h"
-#include "../../X-Server.Logging/include/Logger.h"
+#include <Logger.h>
 
 class UDPBeaon : public IServer
 {

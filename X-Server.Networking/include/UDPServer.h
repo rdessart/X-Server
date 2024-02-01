@@ -3,7 +3,7 @@
 
 #include "IServer.h"
 #include "Message.h"
-#include "../../X-Server.Logging/include/Logger.h"
+#include <Logger.h>
 
 class UDPServer
 {
@@ -12,8 +12,7 @@ public:
     ~UDPServer();
     int Initalize();
     int SendMessage(Message message);
-    //void ReceiveMessage(DatarefManager* manager);
-    bool ReceiveMessage();
+    void ReceiveMessage();
     bool MessagePending();
     bool GetWaitingMessage(Message& outMessage);
 protected:

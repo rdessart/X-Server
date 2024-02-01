@@ -58,7 +58,7 @@ int UDPServer::SendMessage(Message message)
         static_cast<int>(message.target_lenght));
 }
 
-bool UDPServer::ReceiveMessage()
+void UDPServer::ReceiveMessage()
 {
     fd_set read;
     read = master;
@@ -111,48 +111,5 @@ bool UDPServer::GetWaitingMessage(Message& outMessage)
         return false;
     outMessage = m_messageQueue.front();
     m_messageQueue.pop();
+    return true;
 }
-
-
-//void UDPServer::ReceiveMessage(DatarefManager* manager)
-//{
-    //fd_set read;
-    //read = master;
-    //while(1)
-    //{
-    //    int res = select(static_cast<int>(m_maxSocket) + 1, &read, 0, 0, nullptr);
-    //    if (res < 0)
-    //    {
-    //        m_logger.Log("select() has failed " + std::to_string(GETSOCKETERRNO()));
-    //        continue;
-    //    }
-    //    else if(res == 0) 
-    //    {
-    //        continue;
-    //    }
-    //    if (FD_ISSET(_socket, &read))
-    //    {
-    //        struct sockaddr_storage cliAddr;
-    //        socklen_t clientLen = sizeof(cliAddr);
-
-    //        char data[10240];
-    //        int received = recvfrom(_socket, data, 10240, 0, (struct sockaddr*)&cliAddr, &clientLen);
-    //        if (received < 1)
-    //        {
-    //            m_logger.Log("recvfrom() has failed " + std::to_string(GETSOCKETERRNO()));
-    //            continue;
-    //        }
-    //        std::string strData(data);
-    //        strData = strData.substr(0,received);
-    //        json message = json::parse(strData);
-    //        //For performance analysis
-    //        message.emplace("ReceivedTimestamp", std::time(nullptr));
-    //        Message m;
-    //        m.message = message;
-    //        m.target = cliAddr;
-    //        m.target_lenght = clientLen;
-    //        manager->AddMessageToQueue(m);
-    //    }
-    //}
-    //return;
-//}
