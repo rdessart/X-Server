@@ -188,7 +188,7 @@ void Callback(double step, void* tag)
             if (m.message["Name"].type() == json::value_t::array)
             {
                 m.message["Value"] = json();
-                for (auto it : m.message["Name"])
+                for (json& it : m.message["Name"])
                 {
                     std::string name = it.get<std::string>();
                     AbstractDataref* d = cm->GetDatarefByName(name);
@@ -242,9 +242,10 @@ void Callback(double step, void* tag)
                 m.message["Result"] = "Error:Interval is missing or is not a number";
                 break;
             }
-            int intervalMs = m.message["Interval"].get<float>();
+            //int intervalMs = m.message["Interval"].get<float>();
             //if()
 
+            break;
         }
         case OperationsEnum::GetRegDatarefInfo:
         {
@@ -273,13 +274,13 @@ void Callback(double step, void* tag)
     }
 }
 
-void Callback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void* inRefcon)
-{
-    CallBackInfoStruct* info = (CallBackInfoStruct*)inRefcon;
-    
-
-
-}
+//void Callback(float inElapsedSinceLastCall, float inElapsedTimeSinceLastFlightLoop, int inCounter, void* inRefcon)
+//{
+//    CallBackInfoStruct* info = (CallBackInfoStruct*)inRefcon;
+//    
+//
+//
+//}
 
 DatarefManager::DatarefManager(bool enableFlightFactorAPI) :
     m_isFF320Enable(false), m_ff320(0)
@@ -344,12 +345,12 @@ void DatarefManager::AddMessageToQueue(Message m)
     gLock.unlock();
 }
 
-void DatarefManager::AddCallbackToMap(int timeMs)
-{
-    gLock.lock();
-    /*m_messageQueue.emplace(m);*/
-    gLock.unlock();
-}
+//void DatarefManager::AddCallbackToMap(int timeMs)
+//{
+//    gLock.lock();
+//    /*m_messageQueue.emplace(m);*/
+//    gLock.unlock();
+//}
 
 Message DatarefManager::GetNextMessage()
 {
