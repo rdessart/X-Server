@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef IBM
 	#include <netinet/in.h>
 #else
