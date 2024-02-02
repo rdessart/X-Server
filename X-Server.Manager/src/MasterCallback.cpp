@@ -1,32 +1,32 @@
-#include "MasterCallback.h"
+#include "../include/MasterCallback.h"
 
 void Callback(double step, void* tag)
 {
-    MasterCallbackParameter* parameters = (MasterCallbackParameter*)tag;
+    OperationParameters* parameters = (OperationParameters*)tag;
     Message reveivedMessage;
     while (parameters->Server->GetWaitingMessage(reveivedMessage))
     {
         parameters->Logger->Log("Message : '" + reveivedMessage.message.dump() + "'");
         if (!reveivedMessage.message.contains("Operation")) continue;
         std::string operationName = reveivedMessage.message.value("Operation", "");
-        callbackFunction ops = CallbackOperations::GetOperation(operationName);
+        OperationPointer ops = CallbackOperations::GetOperation(operationName);
         if (ops == nullptr)
         {
             parameters->Logger->Log("Operation NOT found : '" + operationName + "'!", Logger::Severity::WARNING);
             return;
         }
         ops(reveivedMessage, parameters);
-        parameters->Server->SendMessageW(reveivedMessage);
+        parameters->Server->SendData(reveivedMessage);
     }
 }
 
-void SpeakOperation(Message& m, MasterCallbackParameter* parameters)
+void SpeakOperation(Message& m, OperationParameters* parameters)
 {
     XPLMSpeakString(m.message.value("Text", "").c_str());
     m.message["Result"] = "Ok";
 }
 
-void SetDatarefOperation(Message& m, MasterCallbackParameter* parameters)
+void SetDatarefOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Setting dataref");
     if (!m.message.contains("Dataref")) return;
@@ -43,7 +43,7 @@ void SetDatarefOperation(Message& m, MasterCallbackParameter* parameters)
     free(d);
 }
 
-void GetDatarefOperation(Message& m, MasterCallbackParameter* parameters)
+void GetDatarefOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Getting dataref");
     if (!m.message.contains("Dataref"))
@@ -68,7 +68,7 @@ void GetDatarefOperation(Message& m, MasterCallbackParameter* parameters)
     free(d);
 }
 
-void RegisterDatarefOperation(Message& m, MasterCallbackParameter* parameters)
+void RegisterDatarefOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Registering dataref");
     if (!m.message.contains("Dataref")) {
@@ -98,7 +98,7 @@ void RegisterDatarefOperation(Message& m, MasterCallbackParameter* parameters)
     m.message["Result"] = "Ok";
 }
 
-void SetRegisteredDatarefOperation(Message& m, MasterCallbackParameter* parameters)
+void SetRegisteredDatarefOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Setting registered dataref");
     if (!m.message.contains("Name"))
@@ -143,7 +143,7 @@ void SetRegisteredDatarefOperation(Message& m, MasterCallbackParameter* paramete
     m.message["Result"] = "Ok";
 }
 
-void GetRegisteredDatarefOperation(Message& m, MasterCallbackParameter* parameters)
+void GetRegisteredDatarefOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Setting registered dataref");
     if (!m.message.contains("Name"))
@@ -177,7 +177,7 @@ void GetRegisteredDatarefOperation(Message& m, MasterCallbackParameter* paramete
     m.message["Result"] = "Ok";
 }
 
-void GetDatarefInfoOperation(Message& m, MasterCallbackParameter* parameters)
+void GetDatarefInfoOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Getting dataref");
     if (!m.message.contains("Dataref")) {
@@ -199,7 +199,7 @@ void GetDatarefInfoOperation(Message& m, MasterCallbackParameter* parameters)
     m.message["Dataref"] = d->ToJson();
 }
 
-void GetRegisteredDatarefInfoOperation(Message& m, MasterCallbackParameter* parameters)
+void GetRegisteredDatarefInfoOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Setting registered dataref");
     if (!m.message.contains("Name"))
@@ -218,7 +218,7 @@ void GetRegisteredDatarefInfoOperation(Message& m, MasterCallbackParameter* para
     m.message["Result"] = "Ok";
 }
 
-void RegisterFlightLoopOperation(Message& m, MasterCallbackParameter* parameters) 
+void RegisterFlightLoopOperation(Message& m, OperationParameters* parameters) 
 /// <summary>
 /// Required Fields:
 ///     json : CallbackInfo {
@@ -249,7 +249,7 @@ void RegisterFlightLoopOperation(Message& m, MasterCallbackParameter* parameters
     m.message["CallbackId"] = flightloopId;
 }
 
-void SubscribeDatarefOperation(Message& m, MasterCallbackParameter* parameters)
+void SubscribeDatarefOperation(Message& m, OperationParameters* parameters)
 {
     if (!m.message.contains("CallbackId"))
     {

@@ -7,17 +7,15 @@
 #include <mutex>
 
 #include <UDPServer.h>
+
 #include <XPLM/XPLMProcessing.h>
-#include <XPLM/XPLMPlugin.h>
-#include <nlohmann/json.hpp>
-#include <Logger.h>
-#include <Message.h>
 
 #include "../Datarefs/AbstractDataref.h"
 #include "../Datarefs/FFA320Dataref.h"
 #include "../Datarefs/Dataref.h"
 #include "../Tools/SharedValue.h"
 #include "../MasterCallback.h"
+#include "../OperationParameters.h"
 
 using json = nlohmann::json;
 typedef std::pair<std::string, AbstractDataref*> NamedDataref;
@@ -32,7 +30,7 @@ class DatarefManager {
 public:
     DatarefManager(bool enableFlightFactorAPI=false);
     AbstractDataref* GetDatarefByName(std::string name);
-    void BindFlightFactorApiCallback(struct MasterCallbackParameter* parameter);
+    void BindFlightFactorApiCallback(struct OperationParameters* parameter);
     void AddDatarefToMap(std::string name, AbstractDataref* dataref);
     Logger GetLogger();
     bool isFF320Api();

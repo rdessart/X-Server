@@ -44,7 +44,7 @@ int UDPServer::Initalize()
     return 0x00;
 }
 
-int UDPServer::SendMessage(Message message)
+int UDPServer::SendData(Message message)
 {
     //For performance analysis
     message.message.emplace("ResponseTimestamp", std::time(nullptr));

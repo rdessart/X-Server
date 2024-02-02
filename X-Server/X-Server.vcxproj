@@ -100,13 +100,13 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)X-Server.Logging\include\;$(SolutionDir)X-Server.Networking\include\;$(SolutionDir)SDK\CHeaders\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)X-Server.Logging\include\;$(SolutionDir)X-Server.Networking\include\;$(SolutionDir)SDK\CHeaders\;$(SolutionDir)X-Server.Manager\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)SDK\Libraries\Win\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>X-Server.Logging.lib;X-Server.Networking.lib;XPLM_64.lib;XPWidgets_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>X-Server.Manager.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -119,7 +119,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)X-Server.Logging\include\;$(SolutionDir)X-Server.Networking\include\;$(SolutionDir)SDK\CHeaders\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)X-Server.Logging\include\;$(SolutionDir)X-Server.Networking\include\;$(SolutionDir)SDK\CHeaders\;$(SolutionDir)X-Server.Manager\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,7 +127,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)SDK\Libraries\Win\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>X-Server.Logging.lib;X-Server.Networking.lib;XPLM_64.lib;XPWidgets_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>X-Server.Manager.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -138,13 +138,13 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)X-Server.Logging\include\;$(SolutionDir)X-Server.Networking\include\;$(SolutionDir)SDK\CHeaders\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)X-Server.Logging\include\;$(SolutionDir)X-Server.Networking\include\;$(SolutionDir)SDK\CHeaders\;$(SolutionDir)X-Server.Manager\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)SDK\Libraries\Win\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>X-Server.Logging.lib;X-Server.Networking.lib;XPLM_64.lib;XPWidgets_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>X-Server.Manager.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,7 +157,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)X-Server.Logging\include\;$(SolutionDir)X-Server.Networking\include\;$(SolutionDir)SDK\CHeaders\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)X-Server.Logging\include\;$(SolutionDir)X-Server.Networking\include\;$(SolutionDir)SDK\CHeaders\;$(SolutionDir)X-Server.Manager\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -165,29 +165,16 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;$(SolutionDir)SDK\Libraries\Win\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>X-Server.Logging.lib;X-Server.Networking.lib;XPLM_64.lib;XPWidgets_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>X-Server.Manager.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Sources\Callbacks.cpp" />
-    <ClCompile Include="Sources\Datarefs\Dataref.cpp" />
+    <!-- <ClCompile Include="Sources\Datarefs\Dataref.cpp" />
     <ClCompile Include="Sources\XPlaneManagers\DatarefManager.cpp" />
-    <ClCompile Include="Sources\Datarefs\FFA320Dataref.cpp" />
+    <ClCompile Include="Sources\Datarefs\FFA320Dataref.cpp" /> -->
     <ClCompile Include="Sources\main.cpp" />
-    <ClCompile Include="Sources\MasterCallback.cpp" />
-    <ClCompile Include="Sources\Tools\Utils.cpp" />
-    <ClCompile Include="Sources\XPlaneManagers\FlightLoopManager.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Sources\Callbacks.h" />
-    <ClInclude Include="Sources\Datarefs\AbstractDataref.h" />
-    <ClInclude Include="Sources\Datarefs\Dataref.h" />
-    <ClInclude Include="Sources\XPlaneManagers\DatarefManager.h" />
-    <ClInclude Include="Sources\Datarefs\FFA320Dataref.h" />
-    <ClInclude Include="Sources\MasterCallback.h" />
-    <ClInclude Include="Sources\Tools\SharedValue.h" />
-    <ClInclude Include="Sources\Tools\Utils.h" />
-    <ClInclude Include="Sources\XPlaneManagers\FlightLoopManager.h" />
+    <!-- <ClCompile Include="Sources\Tools\Utils.cpp" />
+    <ClCompile Include="Sources\XPlaneManagers\FlightLoopManager.cpp" /> -->
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

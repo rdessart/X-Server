@@ -34,7 +34,7 @@ using json = nlohmann::json;
 
 class IServer {
 public:
-	virtual int SendMessage(json message) = 0;
+	virtual int SendData(json message) = 0;
 	virtual json ReceiveMessage() = 0;
 	virtual int Initalize() = 0;
 protected:

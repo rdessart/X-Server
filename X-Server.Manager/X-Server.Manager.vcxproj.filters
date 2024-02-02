@@ -15,57 +15,54 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Sources\main.cpp">
+    <ClCompile Include="src\Datarefs\Dataref.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Tools\Utils.cpp">
+    <ClCompile Include="src\Managers\DatarefManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Datarefs\FFA320Dataref.cpp">
+    <ClCompile Include="src\Datarefs\FFA320Dataref.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Datarefs\Dataref.cpp">
+    <ClCompile Include="src\Managers\FlightLoopManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\XPlaneManagers\DatarefManager.cpp">
+    <ClCompile Include="src\Tools\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Callbacks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\MasterCallback.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\XPlaneManagers\FlightLoopManager.cpp">
+    <ClCompile Include="src\MasterCallback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sources\Tools\SharedValue.h">
+    <ClInclude Include="include\Datarefs\AbstractDataref.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Tools\Utils.h">
+    <ClInclude Include="include\Datarefs\Dataref.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Datarefs\FFA320Dataref.h">
+    <ClInclude Include="include\Managers\DatarefManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Datarefs\AbstractDataref.h">
+    <ClInclude Include="include\Datarefs\FFA320Dataref.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Datarefs\Dataref.h">
+    <ClInclude Include="include\Managers\FlightLoopManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\XPlaneManagers\DatarefManager.h">
+    <ClInclude Include="include\Tools\SharedValue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Callbacks.h">
+    <ClInclude Include="include\Tools\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\MasterCallback.h">
+    <ClInclude Include="include\OperationParameters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\XPlaneManagers\FlightLoopManager.h">
+    <ClInclude Include="include\FlightLoopParameters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MasterCallback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

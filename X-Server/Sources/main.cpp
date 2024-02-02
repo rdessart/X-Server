@@ -15,12 +15,12 @@
 #include <XPLM/XPLMUtilities.h>
 #include <XPLM/XPLMMenus.h>
 
-#include "XPlaneManagers/DatarefManager.h"
-#include "XPlaneManagers/FlightLoopManager.h"
-
-#include "Datarefs/Dataref.h"
 #include <UDPBeacon.h>
 #include <UDPServer.h>
+#include <Managers/DatarefManager.h>
+#include <Managers/FlightLoopManager.h>
+#include <OperationParameters.h>
+#include <MasterCallback.h>
 
 static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter);
 static float BeaconCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter);
@@ -28,7 +28,7 @@ static float RunCallback(float elapsed, float elpasedFlightLoop, int counter, vo
 static void	MenuHandlerCallback(void* inMenuRef, void* inItemRef);
 
 std::map<int, IPInfo> IPMap;
-static UDPBeaon beacon;
+static UDPBeacon beacon;
 static XPLMFlightLoopID initalizerCallbackId;
 static XPLMFlightLoopID beaconCallbackId;
 static Logger logger("X-Server.log", "MAIN", false);
@@ -46,7 +46,7 @@ static XPLMMenuID eSkyInstructorMenu;
 PLUGIN_API int XPluginStart(char* outName, char* outSig, char* outDesc)
 {
 	std::string name = "XServer";
-	std::string sig = "rdessart.XServer.Connector";
+	std::string sig = "rdessart.Tools.XServer";
 	std::string description = "X-Server connector for X-Plane";
 
 #ifdef IBM
@@ -152,7 +152,7 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 			server.ReceiveMessage();
 		});
 
-	MasterCallbackParameter* callbackParam = new MasterCallbackParameter();
+	OperationParameters* callbackParam = new OperationParameters();
 	callbackParam->DatarefManager = datarefManager;
 	callbackParam->Server = &server;
 	callbackParam->FlightLoopManager = flightLoopManager;
@@ -176,7 +176,7 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 
 void SendBeacon(json message)
 {
-	beacon.SendMessage(message);
+	beacon.SendData(message);
 }
 
 float RunCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter)
