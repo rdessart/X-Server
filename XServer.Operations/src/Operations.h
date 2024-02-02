@@ -2,14 +2,23 @@
 
 #include <Logger.h>
 #include <Message.h>
+#include <OperationParameters.h>
 
-void SpeakOperation(Message& message, MasterCallbackParameter* parameters);
-void SetDatarefOperation(Message& message, MasterCallbackParameter* parameters);
-void GetDatarefOperation(Message& message, MasterCallbackParameter* parameters);
-void RegisterDatarefOperation(Message& message, MasterCallbackParameter* parameters);
-void SetRegisteredDatarefOperation(Message& message, MasterCallbackParameter* parameters);
-void GetRegisteredDatarefOperation(Message& message, MasterCallbackParameter* parameters);
-void GetDatarefInfoOperation(Message& message, MasterCallbackParameter* parameters);
-void GetRegisteredDatarefInfoOperation(Message& message, MasterCallbackParameter* parameters);
-void RegisterFlightLoopOperation(Message& m, MasterCallbackParameter* parameters);
-void SubscribeDatarefOperation(Message& m, MasterCallbackParameter* parameters);
+#ifdef OPERATIONS_EXPORT
+#define OPERATION_API extern "C" __declspec(dllexport)
+#else
+#define OPERATION_API extern "C" __declspec(dllimport)
+#endif
+
+OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNames);
+
+OPERATION_API void SpeakOperation(Message& message, OperationParameters* parameters);
+OPERATION_API void SetDatarefOperation(Message& message, OperationParameters* parameters);
+OPERATION_API void GetDatarefOperation(Message& message, OperationParameters* parameters);
+OPERATION_API void RegisterDatarefOperation(Message& message, OperationParameters* parameters);
+OPERATION_API void SetRegisteredDatarefOperation(Message& message, OperationParameters* parameters);
+OPERATION_API void GetRegisteredDatarefOperation(Message& message, OperationParameters* parameters);
+OPERATION_API void GetDatarefInfoOperation(Message& message, OperationParameters* parameters);
+OPERATION_API void GetRegisteredDatarefInfoOperation(Message& message, OperationParameters* parameters);
+OPERATION_API void RegisterFlightLoopOperation(Message& m, OperationParameters* parameters);
+OPERATION_API void SubscribeDatarefOperation(Message& m, OperationParameters* parameters);
