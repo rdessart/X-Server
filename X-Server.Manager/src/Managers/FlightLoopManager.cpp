@@ -1,4 +1,4 @@
-#include "FlightLoopManager.h"
+#include "../../include/Managers/FlightLoopManager.h"
 
 static float GetterFlightLoopCallback(float _, float __, int ___, void* param)
 {
@@ -19,7 +19,7 @@ static float GetterFlightLoopCallback(float _, float __, int ___, void* param)
 	Message m = parameters->ReturnMessage;
 	m.message = outJson;
 
-	parameters->MasterCallbackParameters->Server->SendMessageW(m);
+	parameters->MasterCallbackParameters->Server->SendData(m);
 
 	return parameters->IsTimeReference ? parameters->DeltaTime / 1000.0f : -1.0f * parameters->DeltaTime;
 }
@@ -43,7 +43,7 @@ bool FlightLoopManager::FlightLoopExist(unsigned int id)
 	return id <= m_lastId;
 }
 
-unsigned int FlightLoopManager::GetFlightLoop(unsigned int deltaTime, bool isTimeReference, MasterCallbackParameter* mastercallback, const Message& message)
+unsigned int FlightLoopManager::GetFlightLoop(unsigned int deltaTime, bool isTimeReference, OperationParameters* mastercallback, const Message& message)
 /// <summary>
 /// Create or return the flightloop id of a requested flightloop
 /// </summary>
@@ -74,7 +74,7 @@ std::vector<NamedDataref> FlightLoopManager::GetDatarefForFlightLoop(unsigned in
 	return m_flightLoopsDatarefs.at(flightLoopid);
 }
 
-unsigned int FlightLoopManager::RegisterFlightLoop(unsigned int deltaTime, bool isTimeReference, MasterCallbackParameter* mastercallback, const Message& message)
+unsigned int FlightLoopManager::RegisterFlightLoop(unsigned int deltaTime, bool isTimeReference, OperationParameters* mastercallback, const Message& message)
 {
 	m_lastId++;
 	FlightLoopParameter* parameters = new FlightLoopParameter();

@@ -14,9 +14,5 @@ Network Available API for simulator interaction.
 
 
 ## Planned Functionality with this branch
-- [x] Create a Getter FlightLoop (a Callback with subscribed datarefs are returned every X Seconds or Frame)
-- [x] Subscribe dataref (Link a register dataref with a callback)
-- [ ] UnSubscride dataref
-- [ ] Unregister callback
-- [ ] Assign action to the callback :
-       We could add a list of other actions to a specified callback (Set datarefs repeatably)
+ - [ ] LoadDLL call to load DLL of functionality
+ - [ ] Realease DLL to detach DLL

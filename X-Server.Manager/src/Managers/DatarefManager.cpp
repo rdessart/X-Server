@@ -1,4 +1,12 @@
-#include "DatarefManager.h"
+#include "../../include/Managers/DatarefManager.h"
+
+#include <mutex>
+#include <XPLM/XPLMProcessing.h>
+#include <XPLM/XPLMPlugin.h>
+#include <nlohmann/json.hpp>
+#include <Logger.h>
+#include <Message.h>
+
 
 DatarefManager::DatarefManager(bool enableFlightFactorAPI) :
     m_isFF320Enable(false), m_ff320(0)
@@ -26,7 +34,7 @@ DatarefManager::DatarefManager(bool enableFlightFactorAPI) :
 
 }
 
-void DatarefManager::BindFlightFactorApiCallback(MasterCallbackParameter* parameter)
+void DatarefManager::BindFlightFactorApiCallback(OperationParameters* parameter)
 {
     if (m_isFF320Enable)
         m_ff320->DataAddUpdate(Callback, parameter);

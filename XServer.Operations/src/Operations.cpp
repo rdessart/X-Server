@@ -1,32 +1,38 @@
-#include "MasterCallback.h"
+#include "Operations.h"
 
-void Callback(double step, void* tag)
+#include <XPLM/XPLMUtilities.h>
+#include <Managers/DatarefManager.h>
+#include <Managers/FlightLoopManager.h>
+#include <Datarefs/AbstractDataref.h>
+#include <Datarefs/Dataref.h>
+#include <Datarefs/FFA320Dataref.h>
+
+#define NAMEOF(name) #name
+
+OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNames)
 {
-    MasterCallbackParameter* parameters = (MasterCallbackParameter*)tag;
-    Message reveivedMessage;
-    while (parameters->Server->GetWaitingMessage(reveivedMessage))
-    {
-        parameters->Logger->Log("Message : '" + reveivedMessage.message.dump() + "'");
-        if (!reveivedMessage.message.contains("Operation")) continue;
-        std::string operationName = reveivedMessage.message.value("Operation", "");
-        callbackFunction ops = CallbackOperations::GetOperation(operationName);
-        if (ops == nullptr)
-        {
-            parameters->Logger->Log("Operation NOT found : '" + operationName + "'!", Logger::Severity::WARNING);
-            return;
-        }
-        ops(reveivedMessage, parameters);
-        parameters->Server->SendMessageW(reveivedMessage);
-    }
+    if (operationsNames == nullptr) return -1;
+    size_t sizeBefore = operationsNames->size();
+    operationsNames->emplace("speak",          NAMEOF(SpeakOperation));
+    operationsNames->emplace("setdata",        NAMEOF(SetDatarefOperation));
+    operationsNames->emplace("getdata",        NAMEOF(GetDatarefOperation));
+    operationsNames->emplace("regdata",        NAMEOF(RegisterDatarefOperation));
+    operationsNames->emplace("setregdata",     NAMEOF(SetRegisteredDatarefOperation));
+    operationsNames->emplace("getregdata",     NAMEOF(GetRegisteredDatarefOperation));
+    operationsNames->emplace("datainfo",       NAMEOF(GetDatarefInfoOperation));
+    operationsNames->emplace("regdatainfo",    NAMEOF(GetRegisteredDatarefInfoOperation));
+
+
+    return (int)(operationsNames->size() - sizeBefore);
 }
 
-void SpeakOperation(Message& m, MasterCallbackParameter* parameters)
+OPERATION_API void SpeakOperation(Message& m, OperationParameters* parameters)
 {
     XPLMSpeakString(m.message.value("Text", "").c_str());
     m.message["Result"] = "Ok";
 }
 
-void SetDatarefOperation(Message& m, MasterCallbackParameter* parameters)
+OPERATION_API void SetDatarefOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Setting dataref");
     if (!m.message.contains("Dataref")) return;
@@ -43,7 +49,7 @@ void SetDatarefOperation(Message& m, MasterCallbackParameter* parameters)
     free(d);
 }
 
-void GetDatarefOperation(Message& m, MasterCallbackParameter* parameters)
+OPERATION_API void GetDatarefOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Getting dataref");
     if (!m.message.contains("Dataref"))
@@ -68,7 +74,7 @@ void GetDatarefOperation(Message& m, MasterCallbackParameter* parameters)
     free(d);
 }
 
-void RegisterDatarefOperation(Message& m, MasterCallbackParameter* parameters)
+OPERATION_API void RegisterDatarefOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Registering dataref");
     if (!m.message.contains("Dataref")) {
@@ -98,7 +104,7 @@ void RegisterDatarefOperation(Message& m, MasterCallbackParameter* parameters)
     m.message["Result"] = "Ok";
 }
 
-void SetRegisteredDatarefOperation(Message& m, MasterCallbackParameter* parameters)
+OPERATION_API void SetRegisteredDatarefOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Setting registered dataref");
     if (!m.message.contains("Name"))
@@ -143,7 +149,7 @@ void SetRegisteredDatarefOperation(Message& m, MasterCallbackParameter* paramete
     m.message["Result"] = "Ok";
 }
 
-void GetRegisteredDatarefOperation(Message& m, MasterCallbackParameter* parameters)
+OPERATION_API void GetRegisteredDatarefOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Setting registered dataref");
     if (!m.message.contains("Name"))
@@ -177,7 +183,7 @@ void GetRegisteredDatarefOperation(Message& m, MasterCallbackParameter* paramete
     m.message["Result"] = "Ok";
 }
 
-void GetDatarefInfoOperation(Message& m, MasterCallbackParameter* parameters)
+OPERATION_API void GetDatarefInfoOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Getting dataref");
     if (!m.message.contains("Dataref")) {
@@ -199,7 +205,7 @@ void GetDatarefInfoOperation(Message& m, MasterCallbackParameter* parameters)
     m.message["Dataref"] = d->ToJson();
 }
 
-void GetRegisteredDatarefInfoOperation(Message& m, MasterCallbackParameter* parameters)
+OPERATION_API void GetRegisteredDatarefInfoOperation(Message& m, OperationParameters* parameters)
 {
     parameters->Logger->Log("Setting registered dataref");
     if (!m.message.contains("Name"))
@@ -218,7 +224,7 @@ void GetRegisteredDatarefInfoOperation(Message& m, MasterCallbackParameter* para
     m.message["Result"] = "Ok";
 }
 
-void RegisterFlightLoopOperation(Message& m, MasterCallbackParameter* parameters) 
+OPERATION_API void RegisterFlightLoopOperation(Message& m, OperationParameters* parameters)
 /// <summary>
 /// Required Fields:
 ///     json : CallbackInfo {
@@ -249,7 +255,7 @@ void RegisterFlightLoopOperation(Message& m, MasterCallbackParameter* parameters
     m.message["CallbackId"] = flightloopId;
 }
 
-void SubscribeDatarefOperation(Message& m, MasterCallbackParameter* parameters)
+OPERATION_API void SubscribeDatarefOperation(Message& m, OperationParameters* parameters)
 {
     if (!m.message.contains("CallbackId"))
     {

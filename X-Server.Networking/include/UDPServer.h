@@ -11,7 +11,7 @@ public:
 	UDPServer();
     ~UDPServer();
     int Initalize();
-    int SendMessage(Message message);
+    int SendData(Message message);
     void ReceiveMessage();
     bool MessagePending();
     bool GetWaitingMessage(Message& outMessage);

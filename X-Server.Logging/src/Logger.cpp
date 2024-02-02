@@ -1,5 +1,4 @@
 
-#include <XPLM/XPLMUtilities.h>
 #include "../include/Logger.h"
 
 Logger::Logger() : m_logfile(nullptr), m_module("")
@@ -13,12 +12,6 @@ Logger::Logger(std::string filename, std::string module, bool erease)
 		m_logfile = new std::ofstream(filename, std::ios::out);
 	else
 		m_logfile = new std::ofstream(filename, std::ios::app);
-	if (m_logfile->fail())
-	{
-		std::stringstream debug;
-		debug << "[XInstructor][Logger]Unable to open file : '" << filename << "' (as erease = '" << erease << "')\n";
-		XPLMDebugString(debug.str().c_str());
-	}
 }
 
 Logger::~Logger()
@@ -39,10 +32,6 @@ void Logger::Log(std::string message, Logger::Severity severity) const
 {
 	if (m_logfile == nullptr || m_logfile->fail())
 	{
-		std::stringstream ss;
-		ss << CurrentDateTime() << "\t" << m_module << "\t" << this->getSeverityStr(severity) \
-			<< "\t" << message << "\n";
-		XPLMDebugString(ss.str().c_str());
 		return;
 	}
 	*m_logfile << CurrentDateTime() << "\t" << m_module << "\t" << this->getSeverityStr(severity) \
