@@ -21,8 +21,7 @@ OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNa
     operationsNames->emplace("getregdata",     NAMEOF(GetRegisteredDatarefOperation));
     operationsNames->emplace("datainfo",       NAMEOF(GetDatarefInfoOperation));
     operationsNames->emplace("regdatainfo",    NAMEOF(GetRegisteredDatarefInfoOperation));
-    operationsNames->emplace("regflightloop",  NAMEOF(RegisterFlightLoopOperation));
-    operationsNames->emplace("subdata",        NAMEOF(SubscribeDatarefOperation));
+
 
     return (int)(operationsNames->size() - sizeBefore);
 }

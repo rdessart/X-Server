@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cpp.hint" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\Operations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -21,19 +21,19 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{bf475cb2-3d40-4bd7-8409-528f91512932}</ProjectGuid>
-    <RootNamespace>XServerOperations</RootNamespace>
+    <ProjectGuid>{9a8e3ce0-fca6-4e35-acc2-94fcc3eeb6f2}</ProjectGuid>
+    <RootNamespace>XServerDevOperations</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -82,15 +82,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>OPERATIONS_EXPORT=1;IBM=1;XPLM200=1;XPLM210=1;XPLM300=1;XPLM301=1;XPLM303=1;XPLM400=1;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)X-Server.Logging\include;$(SolutionDir)X-Server.Networking\include;$(SolutionDir)X-Server.Manager\include;$(SolutionDir)SDK\CHeaders\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>X-Manager.lib</AdditionalDependencies>
+      <AdditionalDependencies>X-Server.Manager.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -101,9 +98,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>OPERATIONS_EXPORT=1;IBM=1;XPLM200=1;XPLM210=1;XPLM300=1;XPLM301=1;XPLM303=1;XPLM400=1;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>$(SolutionDir)X-Server.Logging\include;$(SolutionDir)X-Server.Networking\include;$(SolutionDir)X-Server.Manager\include;$(SolutionDir)SDK\CHeaders\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -111,7 +105,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>X-Manager.lib</AdditionalDependencies>
+      <AdditionalDependencies>X-Server.Manager.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -128,7 +122,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>X-Server.Manager.lib</AdditionalDependencies>
+      <AdditionalDependencies>X-Server.Manager.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -149,23 +143,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>X-Server.Manager.lib</AdditionalDependencies>
+      <AdditionalDependencies>X-Server.Manager.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <None Include="cpp.hint" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\X-Server.Logging\X-Server.Logging.vcxproj">
-      <Project>{9ab30718-7321-4096-a991-d43dddf50b00}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\X-Server.Manager\X-Server.Manager.vcxproj">
-      <Project>{08306d59-5800-4a76-abc7-464c48add8a1}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\X-Server.Networking\X-Server.Networking.vcxproj">
-      <Project>{a48ddcc4-691f-433a-9236-fba08ebe1f1b}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Operations.cpp" />
   </ItemGroup>
