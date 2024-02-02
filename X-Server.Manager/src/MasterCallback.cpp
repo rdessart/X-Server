@@ -9,7 +9,8 @@ void Callback(double step, void* tag)
         parameters->Logger->Log("Message : '" + reveivedMessage.message.dump() + "'");
         if (!reveivedMessage.message.contains("Operation")) continue;
         std::string operationName = reveivedMessage.message.value("Operation", "");
-        OperationPointer ops = CallbackOperations::GetOperation(operationName);
+
+        OperationPointer ops = parameters->OperationManager->GetOperation(operationName);
         if (ops == nullptr)
         {
             parameters->Logger->Log("Operation NOT found : '" + operationName + "'!", Logger::Severity::WARNING);

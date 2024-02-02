@@ -70,6 +70,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(xplane)</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(xplane)</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -154,6 +160,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\X-Server.Logging\X-Server.Logging.vcxproj">
+      <Project>{9ab30718-7321-4096-a991-d43dddf50b00}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\X-Server.Manager\X-Server.Manager.vcxproj">
+      <Project>{08306d59-5800-4a76-abc7-464c48add8a1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\X-Server.Networking\X-Server.Networking.vcxproj">
+      <Project>{a48ddcc4-691f-433a-9236-fba08ebe1f1b}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -19,6 +19,7 @@
 #include <UDPServer.h>
 #include <Managers/DatarefManager.h>
 #include <Managers/FlightLoopManager.h>
+#include <Managers/OperationManager.h>
 #include <OperationParameters.h>
 #include <MasterCallback.h>
 
@@ -40,6 +41,7 @@ static int SimVersion, SDKVersion;
 
 DatarefManager* datarefManager;
 FlightLoopManager* flightLoopManager;
+OperationManager* operationManager;
 
 static XPLMMenuID eSkyInstructorMenu;
 
@@ -142,6 +144,7 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 	XPLMScheduleFlightLoop(beaconCallbackId, -1, 0);
 	datarefManager = new DatarefManager(true); // ? we force the system to try to initalise FFAPI by default ? TODO:Check if necessary
 	flightLoopManager = new FlightLoopManager();
+	operationManager = new OperationManager();
 
 	res = server.Initalize();
 	logger.Log("UDP Server initalizer returned " + std::to_string(res));
@@ -154,8 +157,9 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 
 	OperationParameters* callbackParam = new OperationParameters();
 	callbackParam->DatarefManager = datarefManager;
-	callbackParam->Server = &server;
 	callbackParam->FlightLoopManager = flightLoopManager;
+	callbackParam->OperationManager = operationManager;
+	callbackParam->Server = &server;
 	callbackParam->Logger = new Logger("X-Server.log", "CALLBACK", false);
 
 	if (!datarefManager->isFF320Api())

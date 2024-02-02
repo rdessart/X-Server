@@ -13,16 +13,16 @@ OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNa
 {
     if (operationsNames == nullptr) return -1;
     size_t sizeBefore = operationsNames->size();
-    if (!operationsNames->contains("speak")) operationsNames->emplace("speak",  NAMEOF(SpeakOperation));
-    if (!operationsNames->contains("setdata")) operationsNames->emplace("setdata",  NAMEOF(SetDatarefOperation));
-    if (!operationsNames->contains("getdata")) operationsNames->emplace("getdata",  NAMEOF(GetDatarefOperation));
-    if (!operationsNames->contains("regdata")) operationsNames->emplace("regdata",  NAMEOF(RegisterDatarefOperation));
-    if (!operationsNames->contains("setregdata")) operationsNames->emplace("setregdata",  NAMEOF(SetRegisteredDatarefOperation));
-    if (!operationsNames->contains("getregdata")) operationsNames->emplace("getregdata",  NAMEOF(GetRegisteredDatarefOperation));
-    if (!operationsNames->contains("datainfo")) operationsNames->emplace("datainfo",  NAMEOF(GetDatarefInfoOperation));
-    if (!operationsNames->contains("regdatainfo")) operationsNames->emplace("regdatainfo",  NAMEOF(GetRegisteredDatarefInfoOperation));
-    if (!operationsNames->contains("regflightloop")) operationsNames->emplace("regflightloop",  NAMEOF(RegisterFlightLoopOperation));
-    if (!operationsNames->contains("subdata")) operationsNames->emplace("subdata",  NAMEOF(SubscribeDatarefOperation));
+    operationsNames->emplace("speak",          NAMEOF(SpeakOperation));
+    operationsNames->emplace("setdata",        NAMEOF(SetDatarefOperation));
+    operationsNames->emplace("getdata",        NAMEOF(GetDatarefOperation));
+    operationsNames->emplace("regdata",        NAMEOF(RegisterDatarefOperation));
+    operationsNames->emplace("setregdata",     NAMEOF(SetRegisteredDatarefOperation));
+    operationsNames->emplace("getregdata",     NAMEOF(GetRegisteredDatarefOperation));
+    operationsNames->emplace("datainfo",       NAMEOF(GetDatarefInfoOperation));
+    operationsNames->emplace("regdatainfo",    NAMEOF(GetRegisteredDatarefInfoOperation));
+    operationsNames->emplace("regflightloop",  NAMEOF(RegisterFlightLoopOperation));
+    operationsNames->emplace("subdata",        NAMEOF(SubscribeDatarefOperation));
 
     return (int)(operationsNames->size() - sizeBefore);
 }

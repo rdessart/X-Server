@@ -193,6 +193,11 @@
     <ClCompile Include="src\UDPBeacon.cpp" />
     <ClCompile Include="src\UDPServer.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\X-Server.Logging\X-Server.Logging.vcxproj">
+      <Project>{9ab30718-7321-4096-a991-d43dddf50b00}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

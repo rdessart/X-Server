@@ -8,8 +8,7 @@
 #include "Managers/FlightLoopManager.h"
 #include "OperationParameters.h"
 
-typedef void(*OperationPointer)(Message&, OperationParameters*);
-typedef int(*OperationLoaderPointer)(std::map<std::string, std::string>*);
+
 
 void Callback(double step, void* tag);
 

@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Managers\OperationManager.cpp" />
     <ClCompile Include="src\Datarefs\Dataref.cpp" />
     <ClCompile Include="src\Managers\DatarefManager.cpp" />
     <ClCompile Include="src\Datarefs\FFA320Dataref.cpp" />
@@ -37,6 +38,15 @@
     <ClInclude Include="include\Tools\SharedValue.h" />
     <ClInclude Include="include\Tools\Utils.h" />
     <ClInclude Include="include\OperationParameters.h" />
+    <ClInclude Include="include\Managers\OperationManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\X-Server.Logging\X-Server.Logging.vcxproj">
+      <Project>{9ab30718-7321-4096-a991-d43dddf50b00}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\X-Server.Networking\X-Server.Networking.vcxproj">
+      <Project>{a48ddcc4-691f-433a-9236-fba08ebe1f1b}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
