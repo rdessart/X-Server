@@ -16,8 +16,12 @@ int OperationManager::DoLoadDLL(std::string path)
 	if (m_linkedDLL.contains(path)) { //DLL is already in memory
 		return -1;
 	}
-
-	HINSTANCE hDLL = LoadLibraryA(path.c_str());
+	
+	#ifdef IBM
+		HINSTANCE hDLL = LoadLibraryA(path.c_str());
+	#else
+		void* hDLL = dlopen(path.c_str(), RTLD_LAZY);
+	#endif
 
 	if (!hDLL) {
 		//Unable to find the file
@@ -27,7 +31,12 @@ int OperationManager::DoLoadDLL(std::string path)
 	m_linkedDLL.emplace(path, hDLL);
 
 	//We try to get the loader function.
-	OperationLoader loader = (OperationLoader)GetProcAddress(m_linkedDLL[path], "GetOperations");
+	#ifdef IBM
+		OperationLoader loader = (OperationLoader)GetProcAddress(m_linkedDLL[path], "GetOperations");
+	#else
+		OperationLoader loader = (OperationLoader)dlsym(m_linkedDLL[path], "GetOperations");
+	#endif
+	
 	if (!loader) {
 		//Didn't find the function or it don't have the right definition.
 		return -3;
@@ -44,7 +53,12 @@ int OperationManager::DoLoadDLL(std::string path)
 	for (auto& kv : functionsNames)
 	{
 		if (!m_loadedFunctions.contains(kv.first)) { //We skip function loading if it has the same name.
-			m_loadedFunctions[kv.first] = (OperationPointer)GetProcAddress(m_linkedDLL[path], kv.second.c_str());
+			// m_loadedFunctions[kv.first] = (OperationPointer)GetProcAddress(m_linkedDLL[path], kv.second.c_str());
+			#ifdef IBM
+				m_loadedFunctions[kv.first] = (OperationPointer)GetProcAddress(m_linkedDLL[path],  kv.second.c_str());
+			#else
+				m_loadedFunctions[kv.first] = (OperationPointer)dlsym(m_linkedDLL[path],  kv.second.c_str());
+			#endif
 		}
 	}
 
@@ -57,7 +71,11 @@ int OperationManager::DoUnloadDll(std::string path)
 
 	//We get back all function linked with the DLL
 	std::map<std::string, std::string> functionsNames;
-	OperationLoader loader = (OperationLoader)GetProcAddress(m_linkedDLL[path], "GetOperations");
+	#ifdef IBM
+		OperationLoader loader = (OperationLoader)GetProcAddress(m_linkedDLL[path], "GetOperations");
+	#else
+		OperationLoader loader = (OperationLoader)dlsym(m_linkedDLL[path], "GetOperations");
+	#endif
 	if (!loader) {
 		//Didn't find the function or it don't have the right definition.
 		return -3;
@@ -74,8 +92,11 @@ int OperationManager::DoUnloadDll(std::string path)
 		if (!m_loadedFunctions.contains(kv.first)) continue;
 		m_loadedFunctions.erase(kv.first);
 	}
-
-	FreeLibrary(m_linkedDLL[path]);
+	#ifdef IBM
+		FreeLibrary(m_linkedDLL[path]);
+	#else
+		dlclose(m_linkedDLL[path]);
+	#endif
 	m_linkedDLL.erase(path);
 	return 0;
 }
