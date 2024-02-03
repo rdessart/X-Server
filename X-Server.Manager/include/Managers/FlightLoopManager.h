@@ -1,5 +1,5 @@
 #pragma once
-#define IBM 1
+
 #include <UDPServer.h>
 #include <map>
 #include <vector>
