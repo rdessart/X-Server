@@ -18,6 +18,7 @@ OPERATION_API int UninitializeDLL(Manager* manager)
     DatarefManager* service = static_cast<DatarefManager*>(manager->GetService("DatarefManager"));
     manager->RemoveService("DatarefManager");
     delete service;
+    return EXIT_SUCCESS;
 }
 
 OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNames)
