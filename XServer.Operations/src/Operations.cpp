@@ -15,7 +15,9 @@ OPERATION_API int InitializeDLL(Manager* manager)
 
 OPERATION_API int UninitializeDLL(Manager* manager)
 {
-    return (int)manager->RemoveService("DatarefManager");
+    DatarefManager* service = static_cast<DatarefManager*>(manager->GetService("DatarefManager"));
+    manager->RemoveService("DatarefManager");
+    delete service;
 }
 
 OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNames)
@@ -30,7 +32,6 @@ OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNa
     operationsNames->emplace("getregdata",     NAMEOF(GetRegisteredDatarefOperation));
     operationsNames->emplace("datainfo",       NAMEOF(GetDatarefInfoOperation));
     operationsNames->emplace("regdatainfo",    NAMEOF(GetRegisteredDatarefInfoOperation));
-
 
     return (int)(operationsNames->size() - sizeBefore);
 }
