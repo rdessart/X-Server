@@ -34,9 +34,20 @@ using json = nlohmann::json;
 
 class IServer {
 public:
-	virtual int SendData(json message) = 0;
-	virtual json ReceiveMessage() = 0;
-	virtual int Initalize() = 0;
+	virtual int SendData(json message) 
+	{
+		return 0;
+	}
+
+	virtual json ReceiveMessage()
+	{
+		return json();
+	}
+
+	virtual int Initalize() 
+	{
+		return 0;
+	}
 protected:
 #ifdef IBM
 	WSADATA _wsa = { 0 };

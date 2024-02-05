@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Manager.cpp" />
     <ClCompile Include="src\Managers\OperationManager.cpp" />
     <ClCompile Include="src\Datarefs\Dataref.cpp" />
     <ClCompile Include="src\Managers\DatarefManager.cpp" />
@@ -31,6 +32,7 @@
     <ClInclude Include="include\Datarefs\AbstractDataref.h" />
     <ClInclude Include="include\Datarefs\Dataref.h" />
     <ClInclude Include="include\FlightLoopParameters.h" />
+    <ClInclude Include="include\Manager.h" />
     <ClInclude Include="include\Managers\DatarefManager.h" />
     <ClInclude Include="include\Datarefs\FFA320Dataref.h" />
     <ClInclude Include="include\Managers\FlightLoopManager.h" />
