@@ -4,10 +4,14 @@
 #include <Message.h>
 #include <Manager.h>
 
-#ifdef OPERATIONS_EXPORT
-#define OPERATION_API extern "C" __declspec(dllexport)
+#ifdef IBM
+    #ifdef OPERATIONS_EXPORT
+        #define OPERATION_API extern "C" __declspec(dllexport)
+    #else
+        #define OPERATION_API extern "C" __declspec(dllimport)
+    #endif
 #else
-#define OPERATION_API extern "C" __declspec(dllimport)
+    #define OPERATION_API extern "C" 
 #endif
 
 OPERATION_API int InitializeDLL(Manager* manager);

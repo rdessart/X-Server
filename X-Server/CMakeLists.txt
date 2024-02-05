@@ -42,7 +42,7 @@ target_link_libraries(
 get_test_property(XServer WORKING_DIRECTORY test_dir)
 message("My test's working directory: ${test_dir}")
 
-set_target_properties(XServer PROPERTIES LINK_FLAGS "-Wl,-F ../SDK/Libraries/Mac/ -fPIC -fvisibility=hidden")
+set_target_properties(XServer PROPERTIES LINK_FLAGS "-Wl,-F ../../SDK/Libraries/Mac/ -fPIC -fvisibility=hidden")
 set_target_properties(XServer PROPERTIES OUTPUT_NAME "XServer")
 set_target_properties(XServer PROPERTIES PREFIX "")
 set_target_properties(XServer PROPERTIES SUFFIX ".xpl")

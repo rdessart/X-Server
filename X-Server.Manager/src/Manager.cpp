@@ -10,7 +10,6 @@ Manager::~Manager()
 	for (auto& kv : m_serviceMap)
 	{
 		m_logger.Log("Deleting Service : '" + kv.first + "'");
-		delete kv.second;
 	}
 }
 
