@@ -14,5 +14,5 @@ Network Available API for simulator interaction.
 
 
 ## Planned Functionality with this branch
- - [ ] LoadDLL call to load DLL of functionality
- - [ ] Realease DLL to detach DLL
+ - [x] LoadDLL call to load DLL of functionality
+ - [x] Realease DLL to detach DLL
