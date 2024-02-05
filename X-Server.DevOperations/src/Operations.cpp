@@ -22,9 +22,9 @@ OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNa
 {
     if (operationsNames == nullptr) return -1;
     size_t sizeBefore = operationsNames->size();
-    operationsNames->emplace("speak2",          NAMEOF(SpeakOperation));
+    operationsNames->emplace("speak2",         NAMEOF(SpeakOperation));
     operationsNames->emplace("regflightloop",  NAMEOF(RegisterFlightLoopOperation));
-    //operationsNames->emplace("subdata",        NAMEOF(SubscribeDatarefOperation));
+    operationsNames->emplace("subdata",        NAMEOF(SubscribeDatarefOperation));
 
     return (int)(operationsNames->size() - sizeBefore);
 }

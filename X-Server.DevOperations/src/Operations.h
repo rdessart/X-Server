@@ -19,4 +19,4 @@ OPERATION_API int UninitializeDLL(Manager* manager);
 OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNames);
 
 OPERATION_API void RegisterFlightLoopOperation(Message& m, Manager* manager);
-//OPERATION_API void SubscribeDatarefOperation(Message& m, Manager* manager);
+OPERATION_API void SubscribeDatarefOperation(Message& m, Manager* manager);
