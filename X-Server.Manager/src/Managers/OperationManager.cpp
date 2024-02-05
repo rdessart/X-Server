@@ -35,7 +35,7 @@ int OperationManager::DoLoadDLL(std::string path, Manager* manager)
 	#ifdef IBM
 		DLLInitialize initalizeDll = (DLLInitialize)GetProcAddress(m_linkedDLL[path], "InitializeDLL");
 	#else
-		DLLInitialize loader = (DLLInitialize)dlsym(m_linkedDLL[path], "InitializeDLL");
+		DLLInitialize initalizeDll = (DLLInitialize)dlsym(m_linkedDLL[path], "InitializeDLL");
 	#endif
 	if (!initalizeDll)
 	{
@@ -88,7 +88,7 @@ int OperationManager::DoUnloadDll(std::string path, Manager* manager)
 #ifdef IBM
 	DLLInitialize uninitalizeDll = (DLLInitialize)GetProcAddress(m_linkedDLL[path], "UninitializeDLL");
 #else
-	DLLInitialize loader = (DLLInitialize)dlsym(m_linkedDLL[path], "UninitializeDLL");
+	DLLInitialize uninitalizeDll = (DLLInitialize)dlsym(m_linkedDLL[path], "UninitializeDLL");
 #endif
 	if (!uninitalizeDll)
 	{
