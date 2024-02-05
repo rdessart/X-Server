@@ -44,7 +44,6 @@ bool Manager::RemoveService(std::string name)
 		m_logger.Log("Service Map don't contain a service named '" + name + "' !", Logger::Severity::WARNING);
 		return false;
 	}
-	delete m_serviceMap.at(name);
 	m_serviceMap.erase(name);
 	return true;
 }
