@@ -3,6 +3,7 @@
 .vs
 x64\
 win32\
+build/
 *.ar
 # Prerequisites
 *.d

@@ -1,0 +1,42 @@
+cmake_minimum_required(VERSION 3.14)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_BUILD_TYPE debug)
+project("Manager" VERSION 1.0.0 LANGUAGES C CXX)
+
+include_directories(
+    ../X-Server.Logging/include 
+    ../X-Server.Networking/include
+    ../SDK/CHeaders/
+    ~/vcpkg/installed/arm64-osx/include/)
+
+add_definitions(-DXPLM200=1 -DXPLM210=1 -DXPLM300=1 -DXPLM301=1 -DXPLM303=1 -DXPLM400=1 -DAPL=1)
+
+add_library(Manager 
+   src/MasterCallback.cpp
+   src/Datarefs/Dataref.cpp
+   src/Datarefs/FFA320Dataref.cpp
+   src/Managers/DatarefManager.cpp
+   src/Managers/FlightLoopManager.cpp
+   src/Managers/OperationManager.cpp
+   src/Tools/Utils.cpp
+
+   include/MasterCallback.h
+   include/OperationParameters.h
+   include/FlightLoopParameters.h
+   include/Datarefs/AbstractDataref.h
+   include/Datarefs/Dataref.h
+   include/Datarefs/FFA320Dataref.h
+   include/Managers/FlightLoopManager.h
+   include/Managers/DatarefManager.h
+   include/Managers/OperationManager.h
+   include/Tools/Utils.h
+   include/Tools/SharedValue.h
+)
+
+set_target_properties(Manager
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "../lib/"
+    LIBRARY_OUTPUT_DIRECTORY "../lib/"
+    RUNTIME_OUTPUT_DIRECTORY "../lib/"
+)
