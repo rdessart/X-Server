@@ -13,7 +13,13 @@ include_directories(
 
 add_definitions(-DXPLM200=1 -DXPLM210=1 -DXPLM300=1 -DXPLM301=1 -DXPLM303=1 -DXPLM400=1 -DAPL=1)
 
-add_library(XServerOps SHARED Sources/main.cpp)
+add_library(XServerOps SHARED 
+    src/DatarefManager.cpp
+    src/DatarefManager.h
+    src/Operations.cpp
+    src/Operations.h
+    src/SharedValue.h
+    )
 
 target_link_libraries(
     XServerOps
@@ -21,8 +27,5 @@ target_link_libraries(
     "Networking"
     "Manager"
     "Logger")
-
-get_test_property(XServerOps WORKING_DIRECTORY test_dir)
-message("My test's working directory: ${test_dir}")
-
-set_target_properties(XServerOps PROPERTIES LINK_FLAGS "-Wl,-F ../SDK/Libraries/Mac/ -fPIC -fvisibility=hidden")
+set_target_properties(XServerOps PROPERTIES COMPILE_FLAGS "-fdeclspec")
+set_target_properties(XServerOps PROPERTIES LINK_FLAGS "-Wl,-F ../SDK/Libraries/Mac/ -fPIC -fvisibility=hidden -fdeclspec")

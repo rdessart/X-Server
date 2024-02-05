@@ -16,22 +16,18 @@ add_library(Manager
    src/MasterCallback.cpp
    src/Datarefs/Dataref.cpp
    src/Datarefs/FFA320Dataref.cpp
-   src/Managers/DatarefManager.cpp
-   src/Managers/FlightLoopManager.cpp
    src/Managers/OperationManager.cpp
    src/Tools/Utils.cpp
+   src/Manager.cpp
 
    include/MasterCallback.h
-   include/OperationParameters.h
-   include/FlightLoopParameters.h
    include/Datarefs/AbstractDataref.h
    include/Datarefs/Dataref.h
    include/Datarefs/FFA320Dataref.h
-   include/Managers/FlightLoopManager.h
-   include/Managers/DatarefManager.h
    include/Managers/OperationManager.h
    include/Tools/Utils.h
    include/Tools/SharedValue.h
+   include/Manager.h
 )
 
 set_target_properties(Manager
