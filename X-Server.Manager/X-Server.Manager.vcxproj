@@ -22,24 +22,18 @@
     <ClCompile Include="src\Manager.cpp" />
     <ClCompile Include="src\Managers\OperationManager.cpp" />
     <ClCompile Include="src\Datarefs\Dataref.cpp" />
-    <ClCompile Include="src\Managers\DatarefManager.cpp" />
     <ClCompile Include="src\Datarefs\FFA320Dataref.cpp" />
-    <ClCompile Include="src\Managers\FlightLoopManager.cpp" />
     <ClCompile Include="src\MasterCallback.cpp" />
     <ClCompile Include="src\Tools\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Datarefs\AbstractDataref.h" />
     <ClInclude Include="include\Datarefs\Dataref.h" />
-    <ClInclude Include="include\FlightLoopParameters.h" />
     <ClInclude Include="include\Manager.h" />
-    <ClInclude Include="include\Managers\DatarefManager.h" />
     <ClInclude Include="include\Datarefs\FFA320Dataref.h" />
-    <ClInclude Include="include\Managers\FlightLoopManager.h" />
     <ClInclude Include="include\MasterCallback.h" />
     <ClInclude Include="include\Tools\SharedValue.h" />
     <ClInclude Include="include\Tools\Utils.h" />
-    <ClInclude Include="include\OperationParameters.h" />
     <ClInclude Include="include\Managers\OperationManager.h" />
   </ItemGroup>
   <ItemGroup>

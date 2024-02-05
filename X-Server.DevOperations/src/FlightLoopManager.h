@@ -7,16 +7,15 @@
 #include <nlohmann/json.hpp>
 
 #include <XPLM/XPLMProcessing.h>
+#include <XPLM/XPLMDataAccess.h>
 
 #include <Message.h>
 
-#include "../Datarefs/AbstractDataref.h"
-#include "../../include/OperationParameters.h"
-#include "../../include/FlightLoopParameters.h"
+#include "FlightLoopParameters.h"
 
 using json = nlohmann::json;
 
-typedef std::pair<std::string, AbstractDataref*> NamedDataref;
+typedef std::pair<std::string, XPLMDataRef> NamedDataref;
 
 class FlightLoopManager 
 {
@@ -30,8 +29,8 @@ public:
 	FlightLoopManager();
 	bool FlightLoopExist(unsigned int deltaTime, bool isTimeReference);
 	bool FlightLoopExist(unsigned int id);
-	unsigned int GetFlightLoop(unsigned int deltaTime, bool isTimeReference, OperationParameters* mastercallback, const Message &message);
-	bool AssignDatarefToFlightLoop(unsigned int flightloopId, std::string name, AbstractDataref* dataref);
+	unsigned int GetFlightLoop(unsigned int deltaTime, bool isTimeReference, Manager* manager, const Message &message);
+	bool AssignDatarefToFlightLoop(unsigned int flightloopId, std::string name, XPLMDataRef dataref);
 	bool AssignDatarefToFlightLoop(unsigned int flightloopId, NamedDataref dataref);
 	std::vector<NamedDataref> GetDatarefForFlightLoop(unsigned int flightLoopid);
 
@@ -41,7 +40,7 @@ protected:
 	std::map<unsigned int, std::vector<NamedDataref>> m_flightLoopsDatarefs;
 	unsigned int m_lastId;
 
-	unsigned int RegisterFlightLoop(unsigned int deltaTime, bool isTimeReference, OperationParameters* mastercallback, const Message& message);
+	unsigned int RegisterFlightLoop(unsigned int deltaTime, bool isTimeReference, Manager* manager, const Message& message);
 	unsigned int UnregisterFlightLoop(unsigned int deltaTime, bool isTimeReference);
 };
 

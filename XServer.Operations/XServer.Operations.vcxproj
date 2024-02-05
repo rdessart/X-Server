@@ -167,10 +167,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\DatarefManager.cpp" />
     <ClCompile Include="src\Operations.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\DatarefManager.h" />
     <ClInclude Include="src\Operations.h" />
+    <ClInclude Include="src\SharedValue.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

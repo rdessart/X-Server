@@ -1,13 +1,17 @@
 #include "../include/Manager.h"
 
-Manager::Manager(IServer& server, Logger& logger) :
-	m_networking(server),
-	m_logger(logger)
+Manager::Manager():
+	m_logger("X-Server.log", "Manager", false)
 {
 }
 
 Manager::~Manager()
 {
+	for (auto& kv : m_serviceMap)
+	{
+		m_logger.Log("Deleting Service : '" + kv.first + "'");
+		delete kv.second;
+	}
 }
 
 int Manager::AddService(std::string name, void* servicePtr)
@@ -24,11 +28,33 @@ int Manager::AddService(std::string name, void* servicePtr)
 }
 
 void* Manager::GetService(std::string name)
-{
+{ 
 	if (!m_serviceMap.contains(name))
 	{
 		m_logger.Log("Service Map don't contain a service named '" + name + "' !", Logger::Severity::WARNING);
 		return nullptr;
 	}
 	return m_serviceMap.at(name);
+}
+
+bool Manager::RemoveService(std::string name)
+{
+	if (!m_serviceMap.contains(name))
+	{
+		m_logger.Log("Service Map don't contain a service named '" + name + "' !", Logger::Severity::WARNING);
+		return false;
+	}
+	delete m_serviceMap.at(name);
+	m_serviceMap.erase(name);
+	return true;
+}
+
+UDPServer* Manager::GetServer()
+{
+	return &m_networking;
+}
+
+Logger* Manager::GetLogger()
+{
+	return &m_logger;
 }

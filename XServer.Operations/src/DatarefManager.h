@@ -10,12 +10,11 @@
 
 #include <XPLM/XPLMProcessing.h>
 
-#include "../Datarefs/AbstractDataref.h"
-#include "../Datarefs/FFA320Dataref.h"
-#include "../Datarefs/Dataref.h"
-#include "../Tools/SharedValue.h"
-#include "../MasterCallback.h"
-#include "../OperationParameters.h"
+#include <Datarefs/AbstractDataref.h>
+#include <Datarefs/FFA320Dataref.h>
+#include <Datarefs/Dataref.h>
+
+#include "SharedValue.h"
 
 using json = nlohmann::json;
 typedef std::pair<std::string, AbstractDataref*> NamedDataref;

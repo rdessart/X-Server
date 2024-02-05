@@ -17,11 +17,11 @@
 
 #include <UDPBeacon.h>
 #include <UDPServer.h>
-#include <Managers/DatarefManager.h>
-#include <Managers/FlightLoopManager.h>
-#include <Managers/OperationManager.h>
-#include <OperationParameters.h>
+
 #include <MasterCallback.h>
+#include <Manager.h>
+#include <Managers/OperationManager.h>
+#include <Datarefs/Dataref.h>
 
 static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter);
 static float BeaconCallback(float elapsed, float elpasedFlightLoop, int counter, void* refcounter);
@@ -34,14 +34,16 @@ static XPLMFlightLoopID initalizerCallbackId;
 static XPLMFlightLoopID beaconCallbackId;
 static Logger logger("X-Server.log", "MAIN", false);
 static std::thread BeaconThread;
-static UDPServer server;
 static std::string AcfAuthor;
 static std::string AcfDescription;
 static int SimVersion, SDKVersion;
 
-DatarefManager* datarefManager;
-FlightLoopManager* flightLoopManager;
-OperationManager* operationManager;
+//UDPServer server;
+//DatarefManager* datarefManager;
+//FlightLoopManager* flightLoopManager;
+//OperationManager* operationManager;
+static Manager manager = Manager();
+
 
 static XPLMMenuID eSkyInstructorMenu;
 
@@ -142,43 +144,29 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 	int res = beacon.Initalize();
 	logger.Log("UDP Beacon initalizer returned " + std::to_string(res));
 	XPLMScheduleFlightLoop(beaconCallbackId, -1, 0);
-	datarefManager = new DatarefManager(true); // ? we force the system to try to initalise FFAPI by default ? TODO:Check if necessary
-	flightLoopManager = new FlightLoopManager();
-	operationManager = new OperationManager();
 
-	res = server.Initalize();
-	logger.Log("UDP Server initalizer returned " + std::to_string(res));
-
+	res = manager.GetServer()->Initalize();
+	manager.GetLogger()->Log("UDP Server initalizer returned " + std::to_string(res));
+	manager.AddService("OperationManager", new OperationManager());
+	
 	auto futptr = std::make_shared<std::future<void>>();
 	*futptr = std::async(std::launch::async, [futptr]()
 		{
-			server.ReceiveMessage();
+			manager.GetServer()->ReceiveMessage();
 		});
 
-	OperationParameters* callbackParam = new OperationParameters();
-	callbackParam->DatarefManager = datarefManager;
-	callbackParam->FlightLoopManager = flightLoopManager;
-	callbackParam->OperationManager = operationManager;
-	callbackParam->Server = &server;
-	callbackParam->Logger = new Logger("X-Server.log", "CALLBACK", false);
+	XPLMCreateFlightLoop_t masterCallback;
+	masterCallback.structSize = sizeof(XPLMCreateFlightLoop_t);
+	masterCallback.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
+	masterCallback.refcon = &manager;
+	masterCallback.callbackFunc = RunCallback;
+	XPLMFlightLoopID callbackId = XPLMCreateFlightLoop(&masterCallback);
+	XPLMScheduleFlightLoop(callbackId, -1.0f, 1);
 
-	if (!datarefManager->isFF320Api())
-	{
-		XPLMCreateFlightLoop_t masterCallback;
-		masterCallback.structSize = sizeof(XPLMCreateFlightLoop_t);
-		masterCallback.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
-		masterCallback.refcon = callbackParam;
-		masterCallback.callbackFunc = RunCallback;
-		XPLMFlightLoopID callbackId = XPLMCreateFlightLoop(&masterCallback);
-		XPLMScheduleFlightLoop(callbackId, -1.0f, 1);
-	}
-	else {
-		datarefManager->BindFlightFactorApiCallback(callbackParam);
-	}
 	return 0;
 }
 
-void SendBeacon(json message)
+static void SendBeacon(json message)
 {
 	beacon.SendData(message);
 }

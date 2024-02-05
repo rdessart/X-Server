@@ -1,4 +1,4 @@
-#include "../../include/Managers/DatarefManager.h"
+#include "DatarefManager.h"
 
 #include <mutex>
 #include <XPLM/XPLMProcessing.h>
@@ -34,11 +34,11 @@ DatarefManager::DatarefManager(bool enableFlightFactorAPI) :
 
 }
 
-void DatarefManager::BindFlightFactorApiCallback(OperationParameters* parameter)
-{
-    if (m_isFF320Enable)
-        m_ff320->DataAddUpdate(Callback, parameter);
-}
+//void DatarefManager::BindFlightFactorApiCallback(OperationParameters* parameter)
+//{
+//    if (m_isFF320Enable)
+//        m_ff320->DataAddUpdate(Callback, parameter);
+//}
 
 AbstractDataref *DatarefManager::GetDatarefByName(std::string name)
 {

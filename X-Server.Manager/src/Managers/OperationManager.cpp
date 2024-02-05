@@ -1,7 +1,8 @@
 #include "../../include/Managers/OperationManager.h"
 
 OperationManager::OperationManager() :
-	m_linkedDLL()
+	m_linkedDLL(),
+	m_logger("X-Server", "OperationManager", false)
 {
 	m_loadedFunctions["loaddll"] = LoadDLL;
 	m_loadedFunctions["unloaddll"] = UnLoadDLL;
@@ -11,7 +12,7 @@ OperationManager::~OperationManager()
 {
 }
 
-int OperationManager::DoLoadDLL(std::string path)
+int OperationManager::DoLoadDLL(std::string path, Manager* manager)
 {
 	if (m_linkedDLL.contains(path)) { //DLL is already in memory
 		return -1;
@@ -25,11 +26,24 @@ int OperationManager::DoLoadDLL(std::string path)
 
 	if (!hDLL) {
 		//Unable to find the file
+		m_logger.Log("Unable to load DLL with path : '" + path + "'!", Logger::Severity::WARNING);
 		return -2;
 	}
 
 	m_linkedDLL.emplace(path, hDLL);
-
+	//We try to get the init function.
+	#ifdef IBM
+		DLLInitialize initalizeDll = (DLLInitialize)GetProcAddress(m_linkedDLL[path], "InitializeDLL");
+	#else
+		DLLInitialize loader = (DLLInitialize)dlsym(m_linkedDLL[path], "InitializeDLL");
+	#endif
+	if (!initalizeDll)
+	{
+		m_logger.Log("DLL : '" + path + "' didn't contained a InitializeDLL function!", Logger::Severity::INFO);
+	}
+	else {
+		initalizeDll(manager);
+	}
 	//We try to get the loader function.
 	#ifdef IBM
 		OperationLoader loader = (OperationLoader)GetProcAddress(m_linkedDLL[path], "GetOperations");
@@ -38,6 +52,7 @@ int OperationManager::DoLoadDLL(std::string path)
 	#endif
 	
 	if (!loader) {
+		m_logger.Log("DLL : '" + path + "' didn't contained a GetOperation function! Abording", Logger::Severity::WARNING);
 		//Didn't find the function or it don't have the right definition.
 		return -3;
 	}
@@ -46,6 +61,7 @@ int OperationManager::DoLoadDLL(std::string path)
 	if (loadedCount <= 0) {
 		// we didn't load any function or they was an import error.
 		// loading no function can mean the name are the same as the previous.
+		m_logger.Log("DLL : '" + path + "' No function where loaded, function probably has same operation name as operations allready added.", Logger::Severity::WARNING);
 		return -4;
 	}
 
@@ -65,9 +81,22 @@ int OperationManager::DoLoadDLL(std::string path)
 	return static_cast<int>(m_loadedFunctions.size() - sizeBefore);
 }
 
-int OperationManager::DoUnloadDll(std::string path)
+int OperationManager::DoUnloadDll(std::string path, Manager* manager)
 {
 	if (!m_linkedDLL.contains(path)) return -1;
+
+#ifdef IBM
+	DLLInitialize uninitalizeDll = (DLLInitialize)GetProcAddress(m_linkedDLL[path], "UninitializeDLL");
+#else
+	DLLInitialize loader = (DLLInitialize)dlsym(m_linkedDLL[path], "UninitializeDLL");
+#endif
+	if (!uninitalizeDll)
+	{
+		m_logger.Log("DLL : '" + path + "' didn't contained a InitializeDLL function!", Logger::Severity::INFO);
+	}
+	else {
+		uninitalizeDll(manager);
+	}
 
 	//We get back all function linked with the DLL
 	std::map<std::string, std::string> functionsNames;
@@ -108,7 +137,7 @@ OperationPointer OperationManager::GetOperation(std::string key)
 	return m_loadedFunctions[key];
 }
 
-void LoadDLL(Message& message, OperationParameters* parameters)
+static void LoadDLL(Message& message, Manager* manager)
 {
 	if (!message.message.contains("Path"))
 	{
@@ -117,7 +146,8 @@ void LoadDLL(Message& message, OperationParameters* parameters)
 	}
 
 	std::string path = message.message["Path"].get<std::string>();
-	int res = parameters->OperationManager->DoLoadDLL(path);
+	OperationManager* opsManager = (OperationManager*)manager->GetService("OperationManager");
+	int res = opsManager->DoLoadDLL(path, manager);
 	if (res < 0)
 	{
 		message.message["Result"] = "Error:DLL Load returned an error code : " + std::to_string(res);
@@ -131,16 +161,16 @@ void LoadDLL(Message& message, OperationParameters* parameters)
 	message.message["Result"] = "Ok";
 }
 
-void UnLoadDLL(Message& message, OperationParameters* parameters)
+static void UnLoadDLL(Message& message, Manager* manager)
 {
 	if (!message.message.contains("Path"))
 	{
 		message.message["Result"] = "Error:Missing Path information with dll path";
 		return;
 	}
-
 	std::string path = message.message["Path"].get<std::string>();
-	int res = parameters->OperationManager->DoUnloadDll(path);
+	OperationManager* opsManager = (OperationManager*)manager->GetService("OperationManager");
+	int res = opsManager->DoUnloadDll(path, manager);
 	if (res < 0)
 	{
 		message.message["Result"] = "Error:DLL Load returned an error the DLL was not loaded";

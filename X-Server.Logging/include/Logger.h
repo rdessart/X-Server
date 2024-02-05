@@ -16,6 +16,7 @@ public:
 	enum class Severity {
 		TRACE, // Basic information
 		DEBUG, // Debug information
+		INFO,
 		WARNING, // Cautionous information
 		CRITICAL, // Information are critical but program can keep running
 		FATAL // Crashed
@@ -26,6 +27,7 @@ public:
 	std::string GetModuleName();
 	void SetModuleName(std::string module);
 	virtual void Log(std::string message, Logger::Severity severity = Logger::Severity::DEBUG) const;
+	virtual void Log(std::string message, std::string module, Logger::Severity severity = Logger::Severity::DEBUG) const;
 	const char* CurrentDateTime() const;
 	void operator+=(const std::string& message);
 protected:

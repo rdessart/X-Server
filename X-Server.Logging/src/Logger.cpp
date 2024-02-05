@@ -30,11 +30,16 @@ void Logger::SetModuleName(std::string module)
 
 void Logger::Log(std::string message, Logger::Severity severity) const
 {
+	Log(message, m_module, severity);
+}
+
+void Logger::Log(std::string message, std::string module, Logger::Severity severity) const
+{
 	if (m_logfile == nullptr || m_logfile->fail())
 	{
 		return;
 	}
-	*m_logfile << CurrentDateTime() << "\t" << m_module << "\t" << this->getSeverityStr(severity) \
+	*m_logfile << CurrentDateTime() << "\t" << module << "\t" << this->getSeverityStr(severity) \
 		<< "\t" << message << "\n";
 	m_logfile->flush();
 }
@@ -73,6 +78,8 @@ std::string Logger::getSeverityStr(Logger::Severity severity) const
 		return "TRACE";
 	case Logger::Severity::DEBUG:
 		return "DEBUG";
+	case Logger::Severity::INFO:
+		return "INFO";
 	case Logger::Severity::WARNING:
 		return "WARNING";
 	case Logger::Severity::CRITICAL:

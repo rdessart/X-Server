@@ -1,13 +1,22 @@
 #include "Operations.h"
+#include "DatarefManager.h"
 
 #include <XPLM/XPLMUtilities.h>
-#include <Managers/DatarefManager.h>
-#include <Managers/FlightLoopManager.h>
 #include <Datarefs/AbstractDataref.h>
 #include <Datarefs/Dataref.h>
 #include <Datarefs/FFA320Dataref.h>
 
 #define NAMEOF(name) #name
+
+OPERATION_API int InitializeDLL(Manager* manager)
+{
+    return manager->AddService("DatarefManager", new DatarefManager(true));
+}
+
+OPERATION_API int UninitializeDLL(Manager* manager)
+{
+    return (int)manager->RemoveService("DatarefManager");
+}
 
 OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNames)
 {
@@ -26,21 +35,27 @@ OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNa
     return (int)(operationsNames->size() - sizeBefore);
 }
 
-OPERATION_API void SpeakOperation(Message& m, OperationParameters* parameters)
+OPERATION_API void SpeakOperation(Message& m, Manager* manager)
 {
     XPLMSpeakString(m.message.value("Text", "").c_str());
     m.message["Result"] = "Ok";
 }
 
-OPERATION_API void SetDatarefOperation(Message& m, OperationParameters* parameters)
+OPERATION_API void SetDatarefOperation(Message& m, Manager* manager)
 {
-    parameters->Logger->Log("Setting dataref");
-    if (!m.message.contains("Dataref")) return;
+    manager->GetLogger()->Log("Setting dataref", "X-Server.Operations.DLL");
+    if (!m.message.contains("Dataref")) 
+    { 
+        m.message["Result"] = "Error:Missing Dataref Section";
+        return; 
+    }
+    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
     AbstractDataref* d;
     std::string link = m.message["Dataref"]["Link"].get<std::string>();
 
-    if (parameters->DatarefManager->isFF320Api() && link.find("Aircraft") != std::string::npos && link.find(".") != std::string::npos)
-        d = new FFDataref(parameters->DatarefManager->GetFF320Interface());
+
+    if (datarefManager->isFF320Api() && link.find("Aircraft") != std::string::npos && link.find(".") != std::string::npos)
+        d = new FFDataref(datarefManager->GetFF320Interface());
     else
         d = new Dataref();
 
@@ -49,21 +64,22 @@ OPERATION_API void SetDatarefOperation(Message& m, OperationParameters* paramete
     free(d);
 }
 
-OPERATION_API void GetDatarefOperation(Message& m, OperationParameters* parameters)
+OPERATION_API void GetDatarefOperation(Message& m, Manager* manager)
 {
-    parameters->Logger->Log("Getting dataref");
+    manager->GetLogger()->Log("Getting dataref", "X-Server.Operations.DLL");
     if (!m.message.contains("Dataref"))
     {
         m.message["Result"] = "Error:Missing Dataref entry in JSON";
         return;
     }
+    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
     std::string link = m.message["Dataref"]["Link"].get<std::string>();
     AbstractDataref* d;
-    if (parameters->DatarefManager->isFF320Api() &&
+    if (datarefManager->isFF320Api() &&
         link.find("Aircraft") != std::string::npos &&
         link.find(".") != std::string::npos)
     {
-        d = new FFDataref(parameters->DatarefManager->GetFF320Interface());
+        d = new FFDataref(datarefManager->GetFF320Interface());
     }
     else {
         d = new Dataref();
@@ -74,9 +90,9 @@ OPERATION_API void GetDatarefOperation(Message& m, OperationParameters* paramete
     free(d);
 }
 
-OPERATION_API void RegisterDatarefOperation(Message& m, OperationParameters* parameters)
+OPERATION_API void RegisterDatarefOperation(Message& m, Manager* manager)
 {
-    parameters->Logger->Log("Registering dataref");
+    manager->GetLogger()->Log("Registering dataref", "X-Server.Operations.DLL");
     if (!m.message.contains("Dataref")) {
         m.message["Result"] = "Error:Missing Dataref entry in JSON";
         return;
@@ -86,27 +102,28 @@ OPERATION_API void RegisterDatarefOperation(Message& m, OperationParameters* par
         m.message["Result"] = "Error:Missing 'Name' field";
         return;
     }
+    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
     std::string link = m.message["Dataref"]["Link"].get<std::string>();
     std::string name = m.message["Name"].get<std::string>();
-    parameters->Logger->Log("Adding : '" + name + std::string("'"));
+    manager->GetLogger()->Log("Adding : '" + name + std::string("'"), "X-Server.Operations.DLL");
     AbstractDataref* d;
-    if (parameters->DatarefManager->isFF320Api() &&
+    if (datarefManager->isFF320Api() &&
         link.find("Aircraft") != std::string::npos &&
         link.find(".") != std::string::npos)
     {
-        d = new FFDataref(parameters->DatarefManager->GetFF320Interface());
+        d = new FFDataref(datarefManager->GetFF320Interface());
     }
     else {
         d = new Dataref();
     }
     d->FromJson(m.message["Dataref"]);
-    parameters->DatarefManager->AddDatarefToMap(name, d);
+    datarefManager->AddDatarefToMap(name, d);
     m.message["Result"] = "Ok";
 }
 
-OPERATION_API void SetRegisteredDatarefOperation(Message& m, OperationParameters* parameters)
+OPERATION_API void SetRegisteredDatarefOperation(Message& m, Manager* manager)
 {
-    parameters->Logger->Log("Setting registered dataref");
+    manager->GetLogger()->Log("Setting registered dataref", "X-Server.Operations.DLL");
     if (!m.message.contains("Name"))
     {
         m.message["Result"] = "Error:Missing 'Name' field";
@@ -117,12 +134,13 @@ OPERATION_API void SetRegisteredDatarefOperation(Message& m, OperationParameters
         m.message["Result"] = "Error:Missing 'Value' field";
         return;
     }
+    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
     if (m.message["Name"].type() == json::value_t::object)
     {
         auto values = json::array();
         for (auto it = m.message["Name"].begin(); it != m.message["Name"].end(); ++it)
         {
-            AbstractDataref* d = parameters->DatarefManager->GetDatarefByName(it.key());
+            AbstractDataref* d = datarefManager->GetDatarefByName(it.key());
             if (d == nullptr) {
                 m.message["Result"] = "Error:Dataref not in map !";
                 return;
@@ -138,7 +156,7 @@ OPERATION_API void SetRegisteredDatarefOperation(Message& m, OperationParameters
         return;
     }
     else {
-        AbstractDataref* d = parameters->DatarefManager->GetDatarefByName(m.message.value("Name", ""));
+        AbstractDataref* d = datarefManager->GetDatarefByName(m.message.value("Name", ""));
         if (d == nullptr) {
             m.message["Result"] = "Error:Dataref not in map !";
             return;
@@ -149,21 +167,22 @@ OPERATION_API void SetRegisteredDatarefOperation(Message& m, OperationParameters
     m.message["Result"] = "Ok";
 }
 
-OPERATION_API void GetRegisteredDatarefOperation(Message& m, OperationParameters* parameters)
+OPERATION_API void GetRegisteredDatarefOperation(Message& m, Manager* manager)
 {
-    parameters->Logger->Log("Setting registered dataref");
+    manager->GetLogger()->Log("Setting registered dataref");
     if (!m.message.contains("Name"))
     {
         m.message["Result"] = "Error:Missing 'Name' field";
         return;
     }
+    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
     if (m.message["Name"].type() == json::value_t::array)
     {
         m.message["Value"] = json();
         for (json& it : m.message["Name"])
         {
             std::string name = it.get<std::string>();
-            AbstractDataref* d = parameters->DatarefManager->GetDatarefByName(name);
+            AbstractDataref* d = datarefManager->GetDatarefByName(name);
             if (d == nullptr) {
                 m.message["Result"] = "Error:Dataref not in map !";
                 return;
@@ -173,7 +192,7 @@ OPERATION_API void GetRegisteredDatarefOperation(Message& m, OperationParameters
         m.message.erase("Name");
     }
     else {
-        AbstractDataref* d = parameters->DatarefManager->GetDatarefByName(m.message.value("Name", ""));
+        AbstractDataref* d = datarefManager->GetDatarefByName(m.message.value("Name", ""));
         if (d == nullptr) {
             m.message["Result"] = "Error:Dataref not in map !";
             return;;
@@ -183,20 +202,21 @@ OPERATION_API void GetRegisteredDatarefOperation(Message& m, OperationParameters
     m.message["Result"] = "Ok";
 }
 
-OPERATION_API void GetDatarefInfoOperation(Message& m, OperationParameters* parameters)
+OPERATION_API void GetDatarefInfoOperation(Message& m, Manager* manager)
 {
-    parameters->Logger->Log("Getting dataref");
+    manager->GetLogger()->Log("Getting dataref Info", "X-Server.Operations.DLL");
     if (!m.message.contains("Dataref")) {
         m.message["Result"] = "Error:Missing Dataref entry in JSON";
         return;
     }
+    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
     std::string link = m.message["Dataref"]["Link"].get<std::string>();
     AbstractDataref* d;
-    if (parameters->DatarefManager->isFF320Api() &&
+    if (datarefManager->isFF320Api() &&
         link.find("Aircraft") != std::string::npos &&
         link.find(".") != std::string::npos)
     {
-        d = new FFDataref(parameters->DatarefManager->GetFF320Interface());
+        d = new FFDataref(datarefManager->GetFF320Interface());
     }
     else {
         d = new Dataref();
@@ -205,16 +225,16 @@ OPERATION_API void GetDatarefInfoOperation(Message& m, OperationParameters* para
     m.message["Dataref"] = d->ToJson();
 }
 
-OPERATION_API void GetRegisteredDatarefInfoOperation(Message& m, OperationParameters* parameters)
+OPERATION_API void GetRegisteredDatarefInfoOperation(Message& m, Manager* manager)
 {
-    parameters->Logger->Log("Setting registered dataref");
+    manager->GetLogger()->Log("Getting registered dataref Info", "X-Server.Operations.DLL");
     if (!m.message.contains("Name"))
     {
         m.message["Result"] = "Error:Missing 'Name' field";
         return;
     }
-
-    AbstractDataref* d = parameters->DatarefManager->GetDatarefByName(m.message.value("Name", ""));
+    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
+    AbstractDataref* d = datarefManager->GetDatarefByName(m.message.value("Name", ""));
     if (d == nullptr) {
         m.message["Result"] = "Error:Dataref not in map !";
         return;
@@ -222,67 +242,4 @@ OPERATION_API void GetRegisteredDatarefInfoOperation(Message& m, OperationParame
 
     m.message["Dataref"] = d->ToJson();
     m.message["Result"] = "Ok";
-}
-
-OPERATION_API void RegisterFlightLoopOperation(Message& m, OperationParameters* parameters)
-/// <summary>
-/// Required Fields:
-///     json : CallbackInfo {
-///         INT  : DeltaTime,
-///         BOOL : IsTime 
-///     }
-/// </summary>
-{
-    if (!m.message.contains("CallbackInfo"))
-    {
-        m.message["Result"] = "Error:Missing Required CallbackInfo Section";
-        return;
-    }
-    unsigned int deltatime = m.message["CallbackInfo"]["DeltaTime"].get<unsigned int>();
-    bool timeRelative = m.message["CallbackInfo"]["IsTime"].get<bool>();
-    unsigned int flightloopId = 0;
-
-    if (!parameters->FlightLoopManager->FlightLoopExist(deltatime, timeRelative))
-    {
-        Message m2;
-        m2.target = m.target;
-        m2.target_lenght = m.target_lenght;
-        flightloopId = parameters->FlightLoopManager->GetFlightLoop(deltatime, timeRelative, parameters, m2);
-    }
-    else
-        flightloopId = parameters->FlightLoopManager->GetFlightLoop(deltatime, timeRelative, nullptr, m);
-    m.message["Result"] = "Ok";
-    m.message["CallbackId"] = flightloopId;
-}
-
-OPERATION_API void SubscribeDatarefOperation(Message& m, OperationParameters* parameters)
-{
-    if (!m.message.contains("CallbackId"))
-    {
-        m.message["Result"] = "Error:Missing Required CallbackId";
-        return;
-    }
-
-    if (!m.message.contains("Name"))
-    {
-        m.message["Result"] = "Error:Missing Required Dataref Name";
-        return;
-    }
-    std::string datarefName = m.message["Name"].get<std::string>();
-    AbstractDataref* dataref = parameters->DatarefManager->GetDatarefByName(datarefName);
-    unsigned int callbackId = m.message["CallbackId"].get<unsigned int>();
-    if (dataref == nullptr)
-    {
-        m.message["Result"] = "Error:Dataref was not registered before call";
-        return;
-    }
-    if (!parameters->FlightLoopManager->FlightLoopExist(callbackId))
-    {
-        m.message["Result"] = "Error:callback not found";
-        return;
-    }
-
-    parameters->FlightLoopManager->AssignDatarefToFlightLoop(callbackId, datarefName, dataref);
-    m.message["Result"] = "Ok";
-    return;
 }

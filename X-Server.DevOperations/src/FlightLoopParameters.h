@@ -1,11 +1,11 @@
 #pragma once
 
-#include "OperationParameters.h"
+#include <Manager.h>
 
 struct FlightLoopParameter {
 	unsigned int DeltaTime;
 	bool IsTimeReference;
 	unsigned int FlightLoopId;
-	struct OperationParameters* MasterCallbackParameters;
+	class Manager* Manager;
 	Message ReturnMessage;
 };

@@ -1,10 +1,11 @@
-#include "../../include/Managers/FlightLoopManager.h"
+#include "FlightLoopManager.h"
 
 static float GetterFlightLoopCallback(float _, float __, int ___, void* param)
 {
 	FlightLoopParameter* parameters = (FlightLoopParameter*)param;
 
-	std::vector<NamedDataref> datarefs = parameters->MasterCallbackParameters->FlightLoopManager->GetDatarefForFlightLoop(parameters->FlightLoopId);
+	std::vector<NamedDataref> datarefs = 
+		static_cast<FlightLoopManager*>(parameters->Manager->GetService("DatarefManager"))->GetDatarefForFlightLoop(parameters->FlightLoopId);
 	json outJson;
 	outJson["Operation"] = "CALLBACK_RETURN";
 	outJson["CallbackID"] = parameters->FlightLoopId;
@@ -12,14 +13,15 @@ static float GetterFlightLoopCallback(float _, float __, int ___, void* param)
 	json kvp;
 	for (NamedDataref& dataref : datarefs)
 	{
-		kvp[dataref.first] = dataref.second->GetValue();
+		//TODO: Correct Code to use correct value
+		kvp[dataref.first] = XPLMGetDatai(dataref.second);
 	}
 	outJson["DatarefsValue"] = kvp;
 
 	Message m = parameters->ReturnMessage;
 	m.message = outJson;
 
-	parameters->MasterCallbackParameters->Server->SendData(m);
+	parameters->Manager->GetServer()->SendData(m);
 
 	return parameters->IsTimeReference ? parameters->DeltaTime / 1000.0f : -1.0f * parameters->DeltaTime;
 }
@@ -43,7 +45,7 @@ bool FlightLoopManager::FlightLoopExist(unsigned int id)
 	return id <= m_lastId;
 }
 
-unsigned int FlightLoopManager::GetFlightLoop(unsigned int deltaTime, bool isTimeReference, OperationParameters* mastercallback, const Message& message)
+unsigned int FlightLoopManager::GetFlightLoop(unsigned int deltaTime, bool isTimeReference, Manager* mastercallback, const Message& message)
 /// <summary>
 /// Create or return the flightloop id of a requested flightloop
 /// </summary>
@@ -55,7 +57,7 @@ unsigned int FlightLoopManager::GetFlightLoop(unsigned int deltaTime, bool isTim
 }
 
 
-bool FlightLoopManager::AssignDatarefToFlightLoop(unsigned int flightloopId, std::string name, AbstractDataref* dataref)
+bool FlightLoopManager::AssignDatarefToFlightLoop(unsigned int flightloopId, std::string name, XPLMDataRef dataref)
 {
 	if (!m_flightLoopsDatarefs.contains(flightloopId)) return false;
 	m_flightLoopsDatarefs[flightloopId].push_back(NamedDataref(name, dataref));
@@ -74,13 +76,13 @@ std::vector<NamedDataref> FlightLoopManager::GetDatarefForFlightLoop(unsigned in
 	return m_flightLoopsDatarefs.at(flightLoopid);
 }
 
-unsigned int FlightLoopManager::RegisterFlightLoop(unsigned int deltaTime, bool isTimeReference, OperationParameters* mastercallback, const Message& message)
+unsigned int FlightLoopManager::RegisterFlightLoop(unsigned int deltaTime, bool isTimeReference, Manager* manager, const Message& message)
 {
 	m_lastId++;
 	FlightLoopParameter* parameters = new FlightLoopParameter();
 	parameters->DeltaTime = deltaTime;
 	parameters->IsTimeReference = isTimeReference;
-	parameters->MasterCallbackParameters = mastercallback;
+	parameters->Manager = manager;
 	parameters->FlightLoopId = m_lastId;
 	parameters->ReturnMessage = message;
 
