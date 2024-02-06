@@ -5,7 +5,7 @@
 struct FlightLoopParameter {
 	unsigned int DeltaTime;
 	bool IsTimeReference;
-	unsigned int FlightLoopId;
+	XPLMFlightLoopID FlightLoopId;
 	class Manager* Manager;
 	Message ReturnMessage;
 };

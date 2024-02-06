@@ -15,7 +15,7 @@
 using json = nlohmann::json;
 
 typedef std::pair<std::string, class AbstractDataref*> NamedDataref;
-
+typedef unsigned int timerInfo;
 class FlightLoopManager 
 {
 /// <summary>
@@ -26,21 +26,24 @@ class FlightLoopManager
 /// </summary>
 public:
 	FlightLoopManager();
-	bool FlightLoopExist(unsigned int deltaTime, bool isTimeReference);
-	bool FlightLoopExist(unsigned int id);
-	unsigned int GetFlightLoop(unsigned int deltaTime, bool isTimeReference, Manager* manager, const Message &message);
-	bool AssignDatarefToFlightLoop(unsigned int flightloopId, std::string name, class AbstractDataref* dataref);
-	bool AssignDatarefToFlightLoop(unsigned int flightloopId, NamedDataref dataref);
-	std::vector<NamedDataref> GetDatarefForFlightLoop(unsigned int flightLoopid);
+	bool FlightLoopExist(timerInfo, bool isTimeReference);
+	bool FlightLoopExist(XPLMFlightLoopID id);
+	XPLMFlightLoopID GetFlightLoop(timerInfo deltaTime, bool isTimeReference, Manager* manager, const Message &message);
+	bool AssignDatarefToFlightLoop(XPLMFlightLoopID flightloopId, std::string name, class AbstractDataref* dataref);
+	bool AssignDatarefToFlightLoop(XPLMFlightLoopID flightloopId, NamedDataref dataref);
+	bool UnassignDatarefToFlightLoop(XPLMFlightLoopID flightloopId, std::string name);
+	bool DeleteFlightLoop(XPLMFlightLoopID flightloopId);
+	std::vector<NamedDataref> GetDatarefForFlightLoop(XPLMFlightLoopID flightLoopid);
 
 protected:
-	std::map<unsigned int, unsigned int> m_timeFlightLoops;
-	std::map<unsigned int, unsigned int> m_frameFlightLoops;
-	std::map<unsigned int, std::vector<NamedDataref>> m_flightLoopsDatarefs;
-	unsigned int m_lastId;
+	std::map<timerInfo, XPLMFlightLoopID> m_timeFlightLoops;
+	std::map<timerInfo, XPLMFlightLoopID> m_frameFlightLoops;
+	std::map<XPLMFlightLoopID, std::vector<NamedDataref>> m_flightLoopsDatarefs;
 
-	unsigned int RegisterFlightLoop(unsigned int deltaTime, bool isTimeReference, Manager* manager, const Message& message);
-	unsigned int UnregisterFlightLoop(unsigned int deltaTime, bool isTimeReference);
+	XPLMFlightLoopID RegisterFlightLoop(unsigned int deltaTime, bool isTimeReference, Manager* manager, const Message& message);
+	XPLMFlightLoopID UnregisterFlightLoop(unsigned int deltaTime, bool isTimeReference);
+
+	int GetFlightLoop(XPLMFlightLoopID id);
 };
 
 // TODO: As Callbacks are linked to the sender, we could juste use and uint as Id. Multiples recepients could have their own callbacks
