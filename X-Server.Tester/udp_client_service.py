@@ -1,3 +1,4 @@
+import os
 import socket
 import json
 import threading
@@ -8,7 +9,7 @@ class UDPClientService(threading.Thread):
     def __init__(self):
         super(UDPClientService, self).__init__(name="UDPReceiverThread")
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.bindTarget = ("0.0.0.0", 50_558)
+        self.bindTarget = ("0.0.0.0", 50556)
         self.simTarget = ("127.0.0.1", 50555)
         self.shoudRun = False
 
@@ -37,6 +38,17 @@ class UDPClientService(threading.Thread):
             if ready[0]:
                 data, emitter = self.sock.recvfrom(1024)
                 logging.info(f"{emitter} >>> {data.decode()}")
+                ops = {}
+                try:
+                    ops = json.loads(data.decode())
+                    if(ops["Operation"] == "CALLBACK_RETURN"):
+                        os.system('cls')
+                        for k, v in ops["DatarefsValue"].items():
+                            print(f"{k} = {v}")
+                        
+                    #     for(k, v in ops["DatarefsValue"].items()):
+                except:
+                    continue
             
 
         logging.debug("shutting service down...")

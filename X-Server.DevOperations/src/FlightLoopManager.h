@@ -7,7 +7,6 @@
 #include <nlohmann/json.hpp>
 
 #include <XPLM/XPLMProcessing.h>
-#include <XPLM/XPLMDataAccess.h>
 
 #include <Message.h>
 
@@ -15,7 +14,7 @@
 
 using json = nlohmann::json;
 
-typedef std::pair<std::string, XPLMDataRef> NamedDataref;
+typedef std::pair<std::string, class AbstractDataref*> NamedDataref;
 
 class FlightLoopManager 
 {
@@ -30,7 +29,7 @@ public:
 	bool FlightLoopExist(unsigned int deltaTime, bool isTimeReference);
 	bool FlightLoopExist(unsigned int id);
 	unsigned int GetFlightLoop(unsigned int deltaTime, bool isTimeReference, Manager* manager, const Message &message);
-	bool AssignDatarefToFlightLoop(unsigned int flightloopId, std::string name, XPLMDataRef dataref);
+	bool AssignDatarefToFlightLoop(unsigned int flightloopId, std::string name, class AbstractDataref* dataref);
 	bool AssignDatarefToFlightLoop(unsigned int flightloopId, NamedDataref dataref);
 	std::vector<NamedDataref> GetDatarefForFlightLoop(unsigned int flightLoopid);
 

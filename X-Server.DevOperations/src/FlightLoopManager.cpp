@@ -1,11 +1,11 @@
 #include "FlightLoopManager.h"
+#include <Datarefs/AbstractDataref.h>
 
 static float GetterFlightLoopCallback(float _, float __, int ___, void* param)
 {
 	FlightLoopParameter* parameters = (FlightLoopParameter*)param;
-
-	std::vector<NamedDataref> datarefs = 
-		static_cast<FlightLoopManager*>(parameters->Manager->GetService("DatarefManager"))->GetDatarefForFlightLoop(parameters->FlightLoopId);
+	FlightLoopManager* flm = static_cast<FlightLoopManager*>(parameters->Manager->GetService("FlightLoopManager"));
+	std::vector<NamedDataref> datarefs = flm->GetDatarefForFlightLoop(parameters->FlightLoopId);
 	json outJson;
 	outJson["Operation"] = "CALLBACK_RETURN";
 	outJson["CallbackID"] = parameters->FlightLoopId;
@@ -13,8 +13,7 @@ static float GetterFlightLoopCallback(float _, float __, int ___, void* param)
 	json kvp;
 	for (NamedDataref& dataref : datarefs)
 	{
-		//TODO: Correct Code to use correct value
-		kvp[dataref.first] = XPLMGetDatai(dataref.second);
+		kvp[dataref.first] = dataref.second->GetValue();
 	}
 	outJson["DatarefsValue"] = kvp;
 
@@ -57,7 +56,7 @@ unsigned int FlightLoopManager::GetFlightLoop(unsigned int deltaTime, bool isTim
 }
 
 
-bool FlightLoopManager::AssignDatarefToFlightLoop(unsigned int flightloopId, std::string name, XPLMDataRef dataref)
+bool FlightLoopManager::AssignDatarefToFlightLoop(unsigned int flightloopId, std::string name, AbstractDataref* dataref)
 {
 	if (!m_flightLoopsDatarefs.contains(flightloopId)) return false;
 	m_flightLoopsDatarefs[flightloopId].push_back(NamedDataref(name, dataref));

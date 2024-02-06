@@ -47,6 +47,11 @@ bool Manager::RemoveService(std::string name)
 	return true;
 }
 
+bool Manager::IsServiceAvailable(std::string name)
+{
+	return m_serviceMap.contains(name);
+}
+
 UDPServer* Manager::GetServer()
 {
 	return &m_networking;

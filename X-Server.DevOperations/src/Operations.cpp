@@ -52,16 +52,16 @@ OPERATION_API void RegisterFlightLoopOperation(Message& m, Manager* manager)
     unsigned int deltatime = m.message["CallbackInfo"]["DeltaTime"].get<unsigned int>();
     bool timeRelative = m.message["CallbackInfo"]["IsTime"].get<bool>();
     unsigned int flightloopId = 0;
-    //FlightLoopManager* flm = (FlightLoopManager)manager->
-    if (!static_cast<FlightLoopManager*>(manager->GetService("FlightLoopManager"))->FlightLoopExist(deltatime, timeRelative))
+    FlightLoopManager* flm = static_cast<FlightLoopManager*>(manager->GetService("FlightLoopManager"));
+    if (!flm->FlightLoopExist(deltatime, timeRelative))
     {
         Message m2;
         m2.target = m.target;
         m2.target_lenght = m.target_lenght;
-        flightloopId = static_cast<FlightLoopManager*>(manager->GetService("FlightLoopManager"))->GetFlightLoop(deltatime, timeRelative, manager, m2);
+        flightloopId = flm->GetFlightLoop(deltatime, timeRelative, manager, m2);
     }
     else
-        flightloopId = static_cast<FlightLoopManager*>(manager->GetService("FlightLoopManager"))->GetFlightLoop(deltatime, timeRelative, nullptr, m);
+        flightloopId = flm->GetFlightLoop(deltatime, timeRelative, nullptr, m);
     m.message["Result"] = "Ok";
     m.message["CallbackId"] = flightloopId;
 }
@@ -89,20 +89,21 @@ OPERATION_API void SubscribeDatarefOperation(Message& m, Manager* manager)
    std::string datarefName = m.message["Name"].get<std::string>();
    AbstractDataref* dataref = new Dataref();
    dataref->FromJson(m.message["Dataref"]);
-
+   FlightLoopManager* flm = static_cast<FlightLoopManager*>(manager->GetService("FlightLoopManager"));
    unsigned int callbackId = m.message["CallbackId"].get<unsigned int>();
+
    if (dataref == nullptr)
    {
        m.message["Result"] = "Error:Dataref was not registered before call";
        return;
    }
-   if (!static_cast<FlightLoopManager*>(manager->GetService("FlightLoopManager"))->FlightLoopExist(callbackId))
+   if (!flm->FlightLoopExist(callbackId))
    {
        m.message["Result"] = "Error:callback not found";
        return;
    }
 
-   static_cast<FlightLoopManager*>(manager->GetService("FlightLoopManager"))->AssignDatarefToFlightLoop(callbackId, datarefName, dataref);
+   flm->AssignDatarefToFlightLoop(callbackId, datarefName, dataref);
    m.message["Result"] = "Ok";
    return;
 }
