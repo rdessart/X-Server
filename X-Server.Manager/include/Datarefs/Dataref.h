@@ -90,18 +90,18 @@ public:
 	/// Return the current value of the dataref (JSON formated).
 	///</summary>
 	///<returns>The value of the dataref as JSON</returns>
-	std::string GetValue() const;
+	json GetValue() const;
 	///<summary>
 	/// Send a new value to the dataref.
 	///</summary>
 	///<param name="value">The value to be sent to the dataref (as JSON)</param>
-	void SetValue(std::string value) const;
+	// void SetValue(std::string value) const;
 	void SetValue(json value) const;
 	///<summary>
 	/// Set a conversion factor to a dataref.
 	///</summary>
 	///<param name="conversionFactor">The multiplication factor to be applied to the dataref on get and set (as a division)</param>
-	void SetConversionFactor(std::string conversionFactor);
+	void SetConversionFactor(json conversionFactor);
 	void FromJson(json data);
 	json ToJson() const;
 protected:
@@ -109,10 +109,10 @@ protected:
 	Dataref::Type m_type;	/* Represent the underlying data type of the dataref */
 	Logger m_logger;		/* The logger */
 	std::string m_link;
-	std::string m_conversionFactor;
-	int setFloatArrayFromJson(int offset, std::string value) const;
+	double m_conversionFactor;
+	// int setFloatArrayFromJson(int offset, std::string value) const;
 	int setFloatArrayFromJson(int offset, json value) const;
-	int setIntArrayFromJson(int offset, std::string value) const;
+	// int setIntArrayFromJson(int offset, std::string value) const;
 	int setIntArrayFromJson(int offset, json value) const;
 };
 

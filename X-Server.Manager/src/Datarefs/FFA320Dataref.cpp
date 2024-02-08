@@ -2,7 +2,7 @@
 
 FFDataref::FFDataref() : m_id(-1),
 m_type(Type::Deleted), m_link(""),
-m_conversionFactor("1.0"),
+m_conversionFactor(1.0),
 m_ffapi(nullptr),
 m_logger(Logger("X-Server.log", "FFDataref", false)),
 m_needUpdate(false)
@@ -65,7 +65,7 @@ std::string FFDataref::GetValue() const
 		if (m_type == Type::Deleted) m_logger.Log(m_link + ": type is 'Deleted'", Logger::Severity::WARNING);
 		return "ID OR TYPE INVALID";
 	}
-	double converstionfactor = std::stod(m_conversionFactor);
+	double converstionfactor = m_conversionFactor;
 	switch (m_type)
 	{
 	case FFDataref::Type::Char:
@@ -145,56 +145,56 @@ std::string FFDataref::GetValue() const
 //	m_needUpdate = true;
 //}
 
-void FFDataref::SetValue(std::string value) const
-{
-	m_logger.Log("[DO_SET_VALUE]" + m_link + " Setting value to " + value);
-	int type = m_ffapi->ValueType(m_id);
-	if (type == Value_Type_float32)
-	{
-		m_logger.Log("[DO_SET_VALUE]" + m_link + " Type is  " + std::to_string(type) + " (float32)");
-		float val(0.0f);
-		try
-		{
-			val = std::stof(value);
-		}
-		catch (std::invalid_argument)
-		{
-			m_logger.Log("[DO_SET_VALUE]" + m_link + " std::stof has crashed because of an invalid argument", Logger::Severity::CRITICAL);
-			return;
-		}
-		m_ffapi->ValueSet(m_id, &val);
-	}
-	else if (type == Value_Type_float64)
-	{
-		m_logger.Log("[DO_SET_VALUE]" + m_link + " Type is  " + std::to_string(type) + " (float64)");
-		double val(0.0);
-		try
-		{
-			val = std::stod(value);
-		}
-		catch (std::invalid_argument)
-		{
-			m_logger.Log("[DO_SET_VALUE]" + m_link + " std::stof has crashed because of an invalid argument", Logger::Severity::CRITICAL);
-			return;
-		}
-		m_ffapi->ValueSet(m_id, &val);
-	}
-	else if (type == Value_Type_sint32)
-	{
-		m_logger.Log("[DO_SET_VALUE]" + m_link + " Type is  " + std::to_string(type) + " (sint32)");
-		int val(0);
-		try
-		{
-			val = std::stoi(value);
-		}
-		catch (std::invalid_argument)
-		{
-			m_logger.Log("[DO_SET_VALUE]" + m_link + " std::stof has crashed because of an invalid argument", Logger::Severity::CRITICAL);
-			return;
-		}
-		m_ffapi->ValueSet(m_id, &val);
-	}
-}
+// void FFDataref::SetValue(std::string value) const
+// {
+// 	m_logger.Log("[DO_SET_VALUE]" + m_link + " Setting value to " + value);
+// 	int type = m_ffapi->ValueType(m_id);
+// 	if (type == Value_Type_float32)
+// 	{
+// 		m_logger.Log("[DO_SET_VALUE]" + m_link + " Type is  " + std::to_string(type) + " (float32)");
+// 		float val(0.0f);
+// 		try
+// 		{
+// 			val = std::stof(value);
+// 		}
+// 		catch (std::invalid_argument)
+// 		{
+// 			m_logger.Log("[DO_SET_VALUE]" + m_link + " std::stof has crashed because of an invalid argument", Logger::Severity::CRITICAL);
+// 			return;
+// 		}
+// 		m_ffapi->ValueSet(m_id, &val);
+// 	}
+// 	else if (type == Value_Type_float64)
+// 	{
+// 		m_logger.Log("[DO_SET_VALUE]" + m_link + " Type is  " + std::to_string(type) + " (float64)");
+// 		double val(0.0);
+// 		try
+// 		{
+// 			val = std::stod(value);
+// 		}
+// 		catch (std::invalid_argument)
+// 		{
+// 			m_logger.Log("[DO_SET_VALUE]" + m_link + " std::stof has crashed because of an invalid argument", Logger::Severity::CRITICAL);
+// 			return;
+// 		}
+// 		m_ffapi->ValueSet(m_id, &val);
+// 	}
+// 	else if (type == Value_Type_sint32)
+// 	{
+// 		m_logger.Log("[DO_SET_VALUE]" + m_link + " Type is  " + std::to_string(type) + " (sint32)");
+// 		int val(0);
+// 		try
+// 		{
+// 			val = std::stoi(value);
+// 		}
+// 		catch (std::invalid_argument)
+// 		{
+// 			m_logger.Log("[DO_SET_VALUE]" + m_link + " std::stof has crashed because of an invalid argument", Logger::Severity::CRITICAL);
+// 			return;
+// 		}
+// 		m_ffapi->ValueSet(m_id, &val);
+// 	}
+// }
 
 void FFDataref::SetValue(json value) const
 {
@@ -296,9 +296,9 @@ void FFDataref::BindAPI(SharedValuesInterface* FF_A320_api)
 	}
 }
 
-void FFDataref::SetConversionFactor(std::string conversionFactor)
+void FFDataref::SetConversionFactor(json conversionFactor)
 {
-	m_conversionFactor = conversionFactor;
+	m_conversionFactor = conversionFactor.get<double>();
 }
 
 int FFDataref::GetID() const

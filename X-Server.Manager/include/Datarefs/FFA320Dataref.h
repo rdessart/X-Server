@@ -34,13 +34,12 @@ public:
 	FFDataref::Type LoadType();
 	std::string GetValue() const;
 	// ATTENTION this would set the target value (value to be set at the next call of the callback)
-	void SetValue(std::string value) const;
 	void SetValue(json value) const;
 #pragma region disabled
 	//void SetTargetValue(); // to be called into the sync loop
 #pragma endregion
 	void BindAPI(SharedValuesInterface* FF_A320_api);
-	void SetConversionFactor(std::string conversionFactor);
+	void SetConversionFactor(json conversionFactor);
 	//void DoSetValue(std::string value);
 	std::string GetTargetValue();
 	int GetID() const;
@@ -58,7 +57,7 @@ protected:
 	std::string m_link;
 	int m_id;
 	Type m_type;
-	std::string m_conversionFactor;
+	double m_conversionFactor;
 	SharedValuesInterface* m_ffapi;
 	Logger m_logger;
 	//void* m_buffer;
