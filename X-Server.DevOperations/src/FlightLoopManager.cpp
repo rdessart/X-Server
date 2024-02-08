@@ -112,6 +112,7 @@ bool FlightLoopManager::DeleteFlightLoop(XPLMFlightLoopID flightloopId)
 				it->second.erase(it->second.begin());
 			}
 			m_flightLoopsDatarefs.erase(it);
+			break;
 		}
 	}
 	return true;
