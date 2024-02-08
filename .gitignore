@@ -52,3 +52,5 @@ build/
 .fake
 /X-Server.Tester/__pycache__
 /X-Server.Tester/main.log
+/X-Server.Operations/x64/Debug
+/X-Server.Operations.Beta/x64/Debug

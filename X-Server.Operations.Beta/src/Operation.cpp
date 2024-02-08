@@ -1,6 +1,9 @@
 #include "Operation.h"
 
-#include <XPLM/XPLMPlanes>
+#include <XPLM/XPLMPlanes.h>
+#include <Datarefs/Dataref.h>
+
+#define NAMEOF(name) #name
 
 OPERATION_API int InitializeDLL(Manager *manager)
 {
@@ -16,18 +19,9 @@ OPERATION_API int GetOperations(std::map<std::string, std::string> *operationsNa
 {
     if (operationsNames == nullptr) return -1;
     size_t sizeBefore = operationsNames->size();
-    operationsNames->emplace("speak",           NAMEOF(SpeakOperation));
-    operationsNames->emplace("setdata",         NAMEOF(SetDatarefOperation));
-    operationsNames->emplace("getdata",         NAMEOF(GetDatarefOperation));
-    operationsNames->emplace("regdata",         NAMEOF(RegisterDatarefOperation));
-    operationsNames->emplace("setregdata",      NAMEOF(SetRegisteredDatarefOperation));
-    operationsNames->emplace("getregdata",      NAMEOF(GetRegisteredDatarefOperation));
-    operationsNames->emplace("datainfo",        NAMEOF(GetDatarefInfoOperation));
-    operationsNames->emplace("regdatainfo",     NAMEOF(GetRegisteredDatarefInfoOperation));
-    operationsNames->emplace("regflightloop",   NAMEOF(RegisterFlightLoopOperation));
-    operationsNames->emplace("subdata",         NAMEOF(SubscribeDatarefOperation));
-    operationsNames->emplace("unsubdata",       NAMEOF(UnsubscribeDatarefOperation));
-    operationsNames->emplace("unregflightloop", NAMEOF(UnregisterFlightLoopOperation));
+    operationsNames->emplace("aquireplanes",          NAMEOF(AquirePlanes));
+    operationsNames->emplace("releaseplanes",         NAMEOF(ReleasePlanes));
+    operationsNames->emplace("setplanecount",         NAMEOF(SetPlanesCount));
     return (int)(operationsNames->size() - sizeBefore);
 }
 
@@ -40,7 +34,7 @@ OPERATION_API void AquirePlanes(Message &message, Manager *manager)
         message.message["Result"] = "Error:Unable to get plane aquisition()";
         return;
     }
-    Dataref dataref = Dataref();
+    Dataref dataref;
     dataref.Load("sim/operation/override/override_TCAS");
     dataref.SetValue("1");
     message.message["Result"] = "Ok";
@@ -54,6 +48,6 @@ OPERATION_API void ReleasePlanes(Message &message, Manager *manager)
 
 OPERATION_API void SetPlanesCount(Message &message, Manager *manager)
 {
-    XPLMSetActiveAircraftCount(message.message["Planes"].get<int>());
+    XPLMSetActiveAircraftCount(message.message["Count"].get<int>());
     message.message["Result"] = "Ok";
 }
