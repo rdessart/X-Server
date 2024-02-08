@@ -19,5 +19,5 @@ Network Available API for simulator interaction.
  - [x] Create a Getter FlightLoop (a Callback with subscribed datarefs are returned every X Seconds or Frame)
  - [x] Subscribe dataref (Link a register dataref with a callback)
  - [x] UnSubscride dataref
- - [ ] Unregister callback
+ - [x] Unregister callback
  - [ ] Assign action to the callback
