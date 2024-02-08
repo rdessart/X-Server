@@ -23,7 +23,7 @@ Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "X-Plane", "E:\X-Plane 11\X-
 		IORedirection = Auto
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XServer.Operations", "XServer.Operations\XServer.Operations.vcxproj", "{BF475CB2-3D40-4BD7-8409-528F91512932}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "X-Server.Operations", "X-Server.Operations\X-Server.Operations.vcxproj", "{BF475CB2-3D40-4BD7-8409-528F91512932}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "X-Server.Manager", "X-Server.Manager\X-Server.Manager.vcxproj", "{08306D59-5800-4A76-ABC7-464C48ADD8A1}"
 EndProject
