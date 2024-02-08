@@ -45,8 +45,6 @@ class UDPClientService(threading.Thread):
                         os.system('cls')
                         for k, v in ops["DatarefsValue"].items():
                             print(f"{k} = {v}")
-                        
-                    #     for(k, v in ops["DatarefsValue"].items()):
                 except:
                     continue
             

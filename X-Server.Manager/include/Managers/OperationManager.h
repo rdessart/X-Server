@@ -21,10 +21,11 @@ public:
 	int DoUnloadDll(std::string path, Manager* manager);
 
 	OperationPointer GetOperation(std::string key);
-	
+	std::map<std::string, std::string> GetLoadedFunctions();
 
 protected:
 	std::map<std::string, OperationPointer> m_loadedFunctions;
+	std::map<std::string, std::string> m_loadedFunctionsName;
 	#ifdef IBM
 	std::map<std::string, HINSTANCE> m_linkedDLL;
 	#else
@@ -35,4 +36,4 @@ protected:
 
 static void LoadDLL(Message& message, Manager* parameters);
 static void UnLoadDLL(Message& message, Manager* parameters);
-
+static void GetLoadedFunction(Message& message, Manager* manager);

@@ -1,8 +1,12 @@
 #include "../include/Manager.h"
 
+#include "../include/Managers/OperationManager.h"
+
+#define NAMEOF(name) #name
 Manager::Manager():
 	m_logger("X-Server.log", "Manager", false)
 {
+	m_serviceMap.emplace(NAMEOF(OperationManager), new OperationManager());
 }
 
 Manager::~Manager()
@@ -13,7 +17,7 @@ Manager::~Manager()
 	}
 }
 
-int Manager::AddService(std::string name, void* servicePtr)
+size_t Manager::AddService(std::string name, void* servicePtr)
 {
 	if (m_serviceMap.contains(name))
 	{

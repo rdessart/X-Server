@@ -10,13 +10,13 @@
 
 OPERATION_API int InitializeDLL(Manager* manager)
 {
-    return manager->AddService("DatarefManager", new DatarefManager(true));
+    return static_cast<int>(manager->AddService(NAMEOF(DatarefManager), new DatarefManager(true)));
 }
 
 OPERATION_API int UninitializeDLL(Manager* manager)
 {
     DatarefManager* service = static_cast<DatarefManager*>(manager->GetService("DatarefManager"));
-    manager->RemoveService("DatarefManager");
+    manager->RemoveService(NAMEOF(DatarefManager));
     delete service;
     return EXIT_SUCCESS;
 }
@@ -51,7 +51,7 @@ OPERATION_API void SetDatarefOperation(Message& m, Manager* manager)
         m.message["Result"] = "Error:Missing Dataref Section";
         return; 
     }
-    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
+    DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
     AbstractDataref* d;
     std::string link = m.message["Dataref"]["Link"].get<std::string>();
 
@@ -74,7 +74,7 @@ OPERATION_API void GetDatarefOperation(Message& m, Manager* manager)
         m.message["Result"] = "Error:Missing Dataref entry in JSON";
         return;
     }
-    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
+    DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
     std::string link = m.message["Dataref"]["Link"].get<std::string>();
     AbstractDataref* d;
     if (datarefManager->isFF320Api() &&
@@ -104,7 +104,7 @@ OPERATION_API void RegisterDatarefOperation(Message& m, Manager* manager)
         m.message["Result"] = "Error:Missing 'Name' field";
         return;
     }
-    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
+    DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
     std::string link = m.message["Dataref"]["Link"].get<std::string>();
     std::string name = m.message["Name"].get<std::string>();
     manager->GetLogger()->Log("Adding : '" + name + std::string("'"), "X-Server.Operations.DLL");
@@ -136,7 +136,7 @@ OPERATION_API void SetRegisteredDatarefOperation(Message& m, Manager* manager)
         m.message["Result"] = "Error:Missing 'Value' field";
         return;
     }
-    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
+    DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
     if (m.message["Name"].type() == json::value_t::object)
     {
         auto values = json::array();
@@ -177,7 +177,7 @@ OPERATION_API void GetRegisteredDatarefOperation(Message& m, Manager* manager)
         m.message["Result"] = "Error:Missing 'Name' field";
         return;
     }
-    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
+    DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
     if (m.message["Name"].type() == json::value_t::array)
     {
         m.message["Value"] = json();
@@ -211,7 +211,7 @@ OPERATION_API void GetDatarefInfoOperation(Message& m, Manager* manager)
         m.message["Result"] = "Error:Missing Dataref entry in JSON";
         return;
     }
-    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
+    DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
     std::string link = m.message["Dataref"]["Link"].get<std::string>();
     AbstractDataref* d;
     if (datarefManager->isFF320Api() &&
@@ -235,7 +235,7 @@ OPERATION_API void GetRegisteredDatarefInfoOperation(Message& m, Manager* manage
         m.message["Result"] = "Error:Missing 'Name' field";
         return;
     }
-    DatarefManager* datarefManager = (DatarefManager*)manager->GetService("DatarefManager");
+    DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
     AbstractDataref* d = datarefManager->GetDatarefByName(m.message.value("Name", ""));
     if (d == nullptr) {
         m.message["Result"] = "Error:Dataref not in map !";

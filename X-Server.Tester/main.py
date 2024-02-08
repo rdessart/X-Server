@@ -1,7 +1,7 @@
 import logging
 
 # logging.basicConfig(level=logging.DEBUG, format='(%(threadName)-9s) %(message)s',)
-logging.basicConfig(filename='main.log', encoding='utf-8',format='%(asctime)s (%(threadName)-9s) %(message)s', level=logging.DEBUG)
+logging.basicConfig(filename='main.log', encoding='utf-8',format='%(asctime)s (%(threadName)-9s) %(message)s', level=logging.DEBUG, filemode="w+")
 
 def run_as_server() -> int:
     from beacon_service import BeaconService

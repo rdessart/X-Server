@@ -1,0 +1,24 @@
+[DLLs]
+"XServer.Operations.dll"
+"X-Server.DevOperations.dll"
+
+[FlightLoops]
+PositionCallback;0.5s
+
+[PositionCallback.Datarefs]
+ALTITUDE_FT;sim/flightmodel/position/elevation;DOUBLE;3.28084
+IAS;sim/flightmodel/position/indicated_airspeed;FLOAT
+GS;sim/flightmodel/position/groundspeed;FLOAT;1.94384
+LATITUDE;sim/flightmodel/position/latitude;DOUBLE
+LONGITUDE;sim/flightmodel/position/longitude;DOUBLE
+PITCH;sim/flightmodel/position/theta;FLOAT
+ROLL;sim/flightmodel/position/phi;FLOAT
+HDG;sim/flightmodel/position/psi;FLOAT
+TIME;sim/time/zulu_time_sec;FLOAT
+DATE;sim/time/local_date_days;INT
+
+[EVENT]
+[TRIGGER]
+ALTITUDE_FT;GREATHER_OR_EQUAL;1500
+[ACTION]
+Speak;"You have reach an altitude of 1500 feets"

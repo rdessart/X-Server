@@ -1,7 +1,9 @@
 from udp_client_service import UDPClientService
 import time
 
-CALLBACK_ID = 2210060538704
+CALLBACK_ID = 2847554231936
+def get_loaded_function(client: UDPClientService) ->None:
+    client.sendMessage({"Operation" : "GetFunctions"})
 
 def load_operations_dll(client: UDPClientService) -> None:
     client.sendMessage({"Operation": "loaddll","Path" : "XServer.Operations.dll"})
@@ -89,4 +91,5 @@ def get_function_map() -> dict:
         "Subscribe Dataref": subscribe_dataref,               #13
         "Unsubscribe Dataref": unsubscribe_dataref,           #14
         "Unregister Flightloop": unregister_flightloop,       #15
+        "Get Function": get_loaded_function,                  #16
     }

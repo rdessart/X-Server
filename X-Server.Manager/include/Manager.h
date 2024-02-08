@@ -10,7 +10,7 @@ public:
 	Manager();
 	~Manager();
 
-	int AddService(std::string name, void* servicePtr);
+	size_t AddService(std::string name, void* servicePtr);
 	void* GetService(std::string name);
 	bool RemoveService(std::string name);
 	bool IsServiceAvailable(std::string name);

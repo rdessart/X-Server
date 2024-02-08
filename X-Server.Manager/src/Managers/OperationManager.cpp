@@ -1,4 +1,5 @@
 #include "../../include/Managers/OperationManager.h"
+#define NAMEOF(name) #name
 
 OperationManager::OperationManager() :
 	m_linkedDLL(),
@@ -6,6 +7,11 @@ OperationManager::OperationManager() :
 {
 	m_loadedFunctions["loaddll"] = LoadDLL;
 	m_loadedFunctions["unloaddll"] = UnLoadDLL;
+	m_loadedFunctions["getfunctions"] = GetLoadedFunction;
+	
+	m_loadedFunctionsName["loaddll"] = NAMEOF(LoadDLL);
+	m_loadedFunctionsName["unloaddll"] = NAMEOF(UnLoadDLL);
+	m_loadedFunctionsName["getfunctions"] = NAMEOF(GetLoadedFunction);
 }
 
 OperationManager::~OperationManager()
@@ -56,8 +62,7 @@ int OperationManager::DoLoadDLL(std::string path, Manager* manager)
 		//Didn't find the function or it don't have the right definition.
 		return -3;
 	}
-	std::map<std::string, std::string> functionsNames;
-	int loadedCount = loader(&functionsNames);
+	int loadedCount = loader(&m_loadedFunctionsName);
 	if (loadedCount <= 0) {
 		// we didn't load any function or they was an import error.
 		// loading no function can mean the name are the same as the previous.
@@ -66,7 +71,7 @@ int OperationManager::DoLoadDLL(std::string path, Manager* manager)
 	}
 
 	std::size_t sizeBefore = m_loadedFunctions.size();
-	for (auto& kv : functionsNames)
+	for (auto& kv : m_loadedFunctionsName)
 	{
 		if (!m_loadedFunctions.contains(kv.first)) { //We skip function loading if it has the same name.
 			// m_loadedFunctions[kv.first] = (OperationPointer)GetProcAddress(m_linkedDLL[path], kv.second.c_str());
@@ -120,6 +125,10 @@ int OperationManager::DoUnloadDll(std::string path, Manager* manager)
 	{
 		if (!m_loadedFunctions.contains(kv.first)) continue;
 		m_loadedFunctions.erase(kv.first);
+		if (m_loadedFunctionsName.contains(kv.first))
+		{
+			m_loadedFunctionsName.erase(kv.first);
+		}
 	}
 	#ifdef IBM
 		FreeLibrary(m_linkedDLL[path]);
@@ -137,6 +146,11 @@ OperationPointer OperationManager::GetOperation(std::string key)
 	return m_loadedFunctions[key];
 }
 
+std::map<std::string, std::string> OperationManager::GetLoadedFunctions()
+{
+	return m_loadedFunctionsName;
+}
+
 static void LoadDLL(Message& message, Manager* manager)
 {
 	if (!message.message.contains("Path"))
@@ -146,7 +160,7 @@ static void LoadDLL(Message& message, Manager* manager)
 	}
 
 	std::string path = message.message["Path"].get<std::string>();
-	OperationManager* opsManager = (OperationManager*)manager->GetService("OperationManager");
+	OperationManager* opsManager = static_cast<OperationManager*>(manager->GetService(NAMEOF(OperationManager)));
 	int res = opsManager->DoLoadDLL(path, manager);
 	if (res < 0)
 	{
@@ -169,12 +183,25 @@ static void UnLoadDLL(Message& message, Manager* manager)
 		return;
 	}
 	std::string path = message.message["Path"].get<std::string>();
-	OperationManager* opsManager = (OperationManager*)manager->GetService("OperationManager");
+	OperationManager* opsManager = static_cast<OperationManager*>(manager->GetService(NAMEOF(OperationManager)));
 	int res = opsManager->DoUnloadDll(path, manager);
 	if (res < 0)
 	{
 		message.message["Result"] = "Error:DLL Load returned an error the DLL was not loaded";
 		return;
 	}
+	message.message["Result"] = "Ok";
+}
+
+static void GetLoadedFunction(Message& message, Manager* manager) 
+{
+	json functions;
+	OperationManager* opsManager = static_cast<OperationManager*>(manager->GetService(NAMEOF(OperationManager)));
+	for (auto& kv : opsManager->GetLoadedFunctions())
+	{
+		functions[kv.first] = kv.second;
+	}
+
+	message.message.emplace("FunctionsMap", functions);
 	message.message["Result"] = "Ok";
 }

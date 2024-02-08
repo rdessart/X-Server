@@ -38,10 +38,6 @@ static std::string AcfAuthor;
 static std::string AcfDescription;
 static int SimVersion, SDKVersion;
 
-//UDPServer server;
-//DatarefManager* datarefManager;
-//FlightLoopManager* flightLoopManager;
-//OperationManager* operationManager;
 static Manager manager = Manager();
 
 
@@ -147,7 +143,6 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 
 	res = manager.GetServer()->Initalize();
 	manager.GetLogger()->Log("UDP Server initalizer returned " + std::to_string(res));
-	manager.AddService("OperationManager", new OperationManager());
 	
 	auto futptr = std::make_shared<std::future<void>>();
 	*futptr = std::async(std::launch::async, [futptr]()
