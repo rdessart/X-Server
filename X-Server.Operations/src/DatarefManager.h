@@ -30,7 +30,8 @@ public:
     DatarefManager(bool enableFlightFactorAPI=false);
     AbstractDataref* GetDatarefByName(std::string name);
     void BindFlightFactorApiCallback(struct OperationParameters* parameter);
-    void AddDatarefToMap(std::string name, AbstractDataref* dataref);
+    void AddDatarefToMap(const std::string& name, AbstractDataref* dataref);
+    void AddDatarefToMap(const std::string& name,const std::string& link);
     Logger GetLogger();
     bool isFF320Api();
     SharedValuesInterface* GetFF320Interface();

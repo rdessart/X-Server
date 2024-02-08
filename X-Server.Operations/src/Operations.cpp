@@ -5,6 +5,8 @@
 #include <Datarefs/AbstractDataref.h>
 #include <Datarefs/Dataref.h>
 #include <Datarefs/FFA320Dataref.h>
+#include <XPLM/XPLMPlanes.h>
+#include <XPLM/XPLMGraphics.h>
 
 #define NAMEOF(name) #name
 
@@ -44,6 +46,10 @@ OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNa
     operationsNames->emplace("subdata",         NAMEOF(SubscribeDatarefOperation));
     operationsNames->emplace("unsubdata",       NAMEOF(UnsubscribeDatarefOperation));
     operationsNames->emplace("unregflightloop", NAMEOF(UnregisterFlightLoopOperation));
+    operationsNames->emplace("aquireplanes",    NAMEOF(AquirePlanes));
+    operationsNames->emplace("releaseplanes",   NAMEOF(ReleasePlanes));
+    operationsNames->emplace("setplanecount",   NAMEOF(SetPlanesCount));
+    operationsNames->emplace("updateplanes",   NAMEOF(UpdatePlanes));
     return (int)(operationsNames->size() - sizeBefore);
 }
 
@@ -370,4 +376,104 @@ OPERATION_API void UnregisterFlightLoopOperation(Message& m, Manager* manager)
         return;
     }
     m.message["Result"] = "Ok";
+}
+
+OPERATION_API void AquirePlanes(Message& message, Manager* manager)
+{
+    //TODO: check if we can pass a callback to be called when we have plane acess.
+    int res = XPLMAcquirePlanes(nullptr, nullptr, nullptr);
+    if (!res)
+    {
+        message.message["Result"] = "Error:Unable to get plane aquisition()";
+        return;
+    }
+    Dataref dataref;
+    dataref.Load("sim/operation/override/override_TCAS");
+    dataref.SetValue(std::to_string(1));
+    message.message["Result"] = "Ok";
+    //registering dataref
+    DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
+    datarefManager->AddDatarefToMap("TCAS_IDENT_S"   , "sim/cockpit2/tcas/targets/modeS_id");
+    datarefManager->AddDatarefToMap("TCAS_CODE_C"    , "sim/cockpit2/tcas/targets/modeC_code");
+    datarefManager->AddDatarefToMap("TCAS_FLIGHT_ID" , "sim/cockpit2/tcas/targets/flight_id");
+    datarefManager->AddDatarefToMap("TCAS_ICAO_TYPES", "sim/cockpit2/tcas/targets/icao_type");
+    datarefManager->AddDatarefToMap("TCAS_X"         , "sim/cockpit2/tcas/targets/position/x");
+    datarefManager->AddDatarefToMap("TCAS_Y"         , "sim/cockpit2/tcas/targets/position/y");
+    datarefManager->AddDatarefToMap("TCAS_Z"         , "sim/cockpit2/tcas/targets/position/z");
+}
+
+OPERATION_API void ReleasePlanes(Message& message, Manager* manager)
+{
+    XPLMReleasePlanes();
+    message.message["Result"] = "Ok";
+}
+
+OPERATION_API void SetPlanesCount(Message& message, Manager* manager)
+{
+    XPLMSetActiveAircraftCount(message.message["Count"].get<int>());
+    message.message["Result"] = "Ok";
+}
+
+OPERATION_API void UpdatePlanes(Message& message, Manager* manager)
+/*
+*     planes : {
+        "ModeS" : [0xFF_FF_FF],
+        "ModeC" : [1234],
+        "FlightId" : ["BEL123"],
+        "IcaoType" : ["A320"],
+        "Position" : [{
+            "Latitude" : 50.0,
+            "Longitude": 5.0,
+            "Elevation" : 100.0,
+        }],
+        "WingSpan" : [35.80],
+        "WingArea" : [122.6],
+        "WakeCat" : [2],
+        "Mass" : [62000],
+        "AOA" : [5.5],
+        "Lift" : [431027.13011943013] #62000 * 9.81 * math.cos(5.5)
+    }
+*/
+{
+    json j = message.message["Planes"];
+    DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
+    AbstractDataref* dataref = datarefManager->GetDatarefByName("TCAS_IDENT_S");
+    dataref->SetValue(j["ModeS"]);
+    datarefManager->GetDatarefByName("TCAS_CODE_C"    )->SetValue(j["ModeC"]);
+    std::vector<std::string> flightsId = j["FlightId"].get<std::vector<std::string>>();
+    std::stringstream flightsIdStream;
+    for (auto& id : flightsId)
+    {
+        flightsIdStream << id << "\0";
+    }
+    datarefManager->GetDatarefByName("TCAS_FLIGHT_ID" )->SetValue(flightsIdStream.str());
+
+    std::vector<std::string> icaoTypes = j["IcaoType"].get<std::vector<std::string>>();
+    std::stringstream icaoTypesStream;
+    for (auto& id : icaoTypes)
+    {
+        icaoTypesStream << id << "\0";
+    }
+    datarefManager->GetDatarefByName("TCAS_ICAO_TYPES")->SetValue(icaoTypesStream.str());
+
+    std::vector<json> positions = j["Positions"].get<std::vector<json>>();
+    json tcasX = json::array();
+    json tcasY = json::array();
+    json tcasZ = json::array();
+    for (auto& pos : positions)
+    {
+        double latitude = pos["Latitude"].get<double>();
+        double longitude = pos["Longitude"].get<double>();
+        double elevation = pos["Elevation"].get<double>();
+        double oX, oY, oZ;
+        XPLMWorldToLocal(latitude, longitude, elevation, &oX, &oY, &oZ);
+        tcasX.push_back(std::to_string(oX));
+        tcasY.push_back(std::to_string(oY));
+        tcasZ.push_back(std::to_string(oZ));
+    }
+
+    datarefManager->GetDatarefByName("TCAS_X"         )->SetValue(tcasX);
+    datarefManager->GetDatarefByName("TCAS_Y"         )->SetValue(tcasY);
+    datarefManager->GetDatarefByName("TCAS_Z"         )->SetValue(tcasZ);
+    return;
 }

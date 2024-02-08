@@ -56,7 +56,7 @@ AbstractDataref *DatarefManager::GetDatarefByName(std::string name)
     return dataref;
 }
 
-void DatarefManager::AddDatarefToMap(std::string name, AbstractDataref* dataref)
+void DatarefManager::AddDatarefToMap(const std::string& name, AbstractDataref* dataref)
 {
     gLock.lock();
         if(m_datarefMap.contains(name))
@@ -66,6 +66,16 @@ void DatarefManager::AddDatarefToMap(std::string name, AbstractDataref* dataref)
         }
         m_datarefMap.emplace(name, dataref);
     gLock.unlock();
+}
+
+void DatarefManager::AddDatarefToMap(const std::string& name, const std::string& link)
+{
+    Dataref* dataref = new Dataref();
+    dataref->Load(link);
+    if (dataref->IsGood())
+    {
+        AddDatarefToMap(name, dataref);
+    }
 }
 
 Logger DatarefManager::GetLogger()

@@ -196,6 +196,57 @@ void FFDataref::SetValue(std::string value) const
 	}
 }
 
+void FFDataref::SetValue(json value) const
+{
+	m_logger.Log("[DO_SET_VALUE]" + m_link + " Setting value to " + value.get<std::string>());
+	int type = m_ffapi->ValueType(m_id);
+	if (type == Value_Type_float32)
+	{
+		m_logger.Log("[DO_SET_VALUE]" + m_link + " Type is  " + std::to_string(type) + " (float32)");
+		float val(0.0f);
+		try
+		{
+			val = value.get<float>();
+		}
+		catch (std::invalid_argument)
+		{
+			m_logger.Log("[DO_SET_VALUE]" + m_link + " std::stof has crashed because of an invalid argument", Logger::Severity::CRITICAL);
+			return;
+		}
+		m_ffapi->ValueSet(m_id, &val);
+	}
+	else if (type == Value_Type_float64)
+	{
+		m_logger.Log("[DO_SET_VALUE]" + m_link + " Type is  " + std::to_string(type) + " (float64)");
+		double val(0.0);
+		try
+		{
+			val = value.get<double>();
+		}
+		catch (std::invalid_argument)
+		{
+			m_logger.Log("[DO_SET_VALUE]" + m_link + " std::stof has crashed because of an invalid argument", Logger::Severity::CRITICAL);
+			return;
+		}
+		m_ffapi->ValueSet(m_id, &val);
+	}
+	else if (type == Value_Type_sint32)
+	{
+		m_logger.Log("[DO_SET_VALUE]" + m_link + " Type is  " + std::to_string(type) + " (sint32)");
+		int val(0);
+		try
+		{
+			val = value.get<int>();
+		}
+		catch (std::invalid_argument)
+		{
+			m_logger.Log("[DO_SET_VALUE]" + m_link + " std::stof has crashed because of an invalid argument", Logger::Severity::CRITICAL);
+			return;
+		}
+		m_ffapi->ValueSet(m_id, &val);
+	}
+}
+
 std::string FFDataref::GetTargetValue()
 {
 	return m_targetValue;

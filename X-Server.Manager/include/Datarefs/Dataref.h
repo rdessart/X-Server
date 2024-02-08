@@ -96,6 +96,7 @@ public:
 	///</summary>
 	///<param name="value">The value to be sent to the dataref (as JSON)</param>
 	void SetValue(std::string value) const;
+	void SetValue(json value) const;
 	///<summary>
 	/// Set a conversion factor to a dataref.
 	///</summary>
@@ -110,7 +111,9 @@ protected:
 	std::string m_link;
 	std::string m_conversionFactor;
 	int setFloatArrayFromJson(int offset, std::string value) const;
+	int setFloatArrayFromJson(int offset, json value) const;
 	int setIntArrayFromJson(int offset, std::string value) const;
+	int setIntArrayFromJson(int offset, json value) const;
 };
 
 

@@ -32,3 +32,7 @@ OPERATION_API void RegisterFlightLoopOperation(Message& m, Manager* manager);
 OPERATION_API void SubscribeDatarefOperation(Message& m, Manager* manager);
 OPERATION_API void UnsubscribeDatarefOperation(Message& m, Manager* manager);
 OPERATION_API void UnregisterFlightLoopOperation(Message& m, Manager* manager);
+OPERATION_API void AquirePlanes(Message& message, Manager* manager);
+OPERATION_API void ReleasePlanes(Message& message, Manager* manager);
+OPERATION_API void SetPlanesCount(Message& message, Manager* manager);
+OPERATION_API void UpdatePlanes(Message& message, Manager* manager);

@@ -35,6 +35,7 @@ public:
 	std::string GetValue() const;
 	// ATTENTION this would set the target value (value to be set at the next call of the callback)
 	void SetValue(std::string value) const;
+	void SetValue(json value) const;
 #pragma region disabled
 	//void SetTargetValue(); // to be called into the sync loop
 #pragma endregion

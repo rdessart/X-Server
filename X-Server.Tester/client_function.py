@@ -1,15 +1,17 @@
+import math
 from udp_client_service import UDPClientService
 import time
+from varname import nameof
 
 CALLBACK_ID = 2847554231936
 def get_loaded_function(client: UDPClientService) ->None:
     client.sendMessage({"Operation" : "GetFunctions"})
 
 def load_operations_dll(client: UDPClientService) -> None:
-    client.sendMessage({"Operation": "loaddll","Path" : "XServer.Operations.dll"})
+    client.sendMessage({"Operation": "loaddll","Path" : "X-Server.Operations.dll"})
 
 def unload_operations_dll(client: UDPClientService) -> None:
-    client.sendMessage({"Operation": "unloaddll","Path" : "XServer.Operations.dll"})
+    client.sendMessage({"Operation": "unloaddll","Path" : "X-Server.Operations.dll"})
 
 def speak(client: UDPClientService) -> None:
     client.sendMessage({"Operation" : "Speak", "Text" : "Hello Python"})
@@ -32,11 +34,11 @@ def set_register_dataref_on(client: UDPClientService) -> None:
 def set_register_dataref_off(client: UDPClientService) -> None:
      client.sendMessage({ "Operation": "setregdata","Name" : "SMOKE","Value" : "0"})
 
-def load_flightloop_dll(client: UDPClientService) -> None:
-    client.sendMessage({"Operation": "loaddll","Path" : "X-Server.DevOperations.dll"})
+def load_beta_dll(client: UDPClientService) -> None:
+    client.sendMessage({"Operation": "loaddll","Path" : "X-Server.Operations.Beta.dll"})
 
-def unload_flightloop_dll(client: UDPClientService) -> None:
-    client.sendMessage({"Operation": "unloaddll","Path" : "X-Server.DevOperations.dll"})
+def unload_beta_dll(client: UDPClientService) -> None:
+    client.sendMessage({"Operation": "unloaddll","Path" : "X-Server.Operations.Beta.dll"})
 
 def speak2(client: UDPClientService) -> None:
      client.sendMessage({"Operation": "Speak2"})
@@ -73,23 +75,55 @@ def unsubscribe_dataref(client: UDPClientService) -> None:
 def unregister_flightloop(client: UDPClientService) -> None:
     client.sendMessage({"Operation": "unregflightloop", "CallbackId": CALLBACK_ID})
 
+def aquire_planes(client: UDPClientService) -> None:
+    client.sendMessage({"Operation": "aquireplanes"})
+
+def release_planes(client: UDPClientService) -> None:
+    client.sendMessage({"Operation": "ReleasePlanes"})
+
+def set_plane_count(client: UDPClientService) -> None:
+    client.sendMessage({"Operation": "setplanecount", "Count": 2})
+
+def update_tcas(client: UDPClientService) -> None:
+    planes = {
+        "ModeS" : [0xFF_FF_FF],
+        "ModeC" : [1234],
+        "FlightId" : ["BEL123"],
+        "IcaoType" : ["A320"],
+        "Position" : [{
+            "Latitude" : 50.0,
+            "Longitude": 5.0,
+            "Elevation" : 100.0,
+        }],
+        "WingSpan" : [35.80],
+        "WingArea" : [122.6],
+        "WakeCat" : [2],
+        "Mass" : [62000],
+        "AOA" : [5.5],
+        "Lift" : [431027.13011943013] #62000 * 9.81 * math.cos(5.5)
+    }
+    client.sendMessage({"Operation": "UpdatePlanes", "Planes" : planes})
+
 def get_function_map() -> dict:
     return {
-        "Load Operation DLL"  : load_operations_dll,          #0
-        "Unload Operation DLL": unload_operations_dll,        #1
-        "Speak": speak,                                       #2
-        "Set Smoke ON": set_smoke_on,                         #3
-        "Set Smoke OFF": set_smoke_off,                       #4
-        "Get Smoke": get_smoke_value,                         #5
-        "Register Dataref": register_dataref,                 #6
-        "Set Register Dataref On": set_register_dataref_on,   #7
-        "Set Register Dataref Off": set_register_dataref_off, #8
-        "Load FlightLoop DLL": load_flightloop_dll,           #9
-        "Unload FlightLoop DLL": unload_flightloop_dll,       #10
-        "Speak 2": speak2,                                    #11
-        "Register FlightLoop": register_flightloop,           #12
-        "Subscribe Dataref": subscribe_dataref,               #13
-        "Unsubscribe Dataref": unsubscribe_dataref,           #14
-        "Unregister Flightloop": unregister_flightloop,       #15
-        "Get Function": get_loaded_function,                  #16
+        nameof(load_operations_dll)  : load_operations_dll,         #0
+        nameof(unload_operations_dll): unload_operations_dll,       #1
+        # nameof(speak): speak,                                       #2
+        # nameof(set_smoke_on): set_smoke_on,                         #3
+        # nameof(set_smoke_off): set_smoke_off,                       #4
+        # nameof(get_smoke_value): get_smoke_value,                   #5
+        # nameof(register_dataref): register_dataref,                 #6
+        # nameof(set_register_dataref_on): set_register_dataref_on,   #7
+        # nameof(set_register_dataref_off): set_register_dataref_off, #8
+        # nameof(register_flightloop): register_flightloop,           #9
+        # nameof(subscribe_dataref): subscribe_dataref,               #10
+        # nameof(unsubscribe_dataref): unsubscribe_dataref,           #11
+        # nameof(unregister_flightloop): unregister_flightloop,       #12
+        # nameof(get_loaded_function): get_loaded_function,           #13
+        # nameof(load_beta_dll): load_beta_dll,                       #14
+        # nameof(unload_beta_dll): unload_beta_dll,                   #15 
+        nameof(aquire_planes): aquire_planes,                       #16
+        nameof(release_planes): release_planes,                     #17 
+        nameof(set_plane_count): set_plane_count,                   #18   
+        nameof(update_tcas): update_tcas,                           #19   
     }
