@@ -6,13 +6,13 @@
 #include "NetworkUtils.h"
 #include <Logger.h>
 
-class UDPBeaon : public IServer
+class UDPBeacon : public IServer
 {
 public:
-    UDPBeaon();
-    UDPBeaon(IPInfo ip, int broadcastPort = 50888, int listeningPort=50555);
+    UDPBeacon();
+    UDPBeacon(IPInfo ip, int broadcastPort = 50888, int listeningPort=50555);
     int Initalize();
-    int SendMessage(json message);
+    int SendData(json message);
     json ReceiveMessage();
     void SetIPAddress(IPInfo ip);
     IPInfo GetIPAddress();

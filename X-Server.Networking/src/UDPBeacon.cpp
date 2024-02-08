@@ -1,6 +1,6 @@
 #include "../include/UDPBeacon.h"
 
-UDPBeaon::UDPBeaon()
+UDPBeacon::UDPBeacon()
 {
     IPInfo ip;
     ip.str_broadcast = "127.0.0.255";
@@ -11,7 +11,7 @@ UDPBeaon::UDPBeaon()
     m_broacastPort = 50888;
 }
 
-UDPBeaon::UDPBeaon(IPInfo ip, int broadcastPort, int listeningPort)
+UDPBeacon::UDPBeacon(IPInfo ip, int broadcastPort, int listeningPort)
 {
     _ips = FindIp();
     m_ip = ip;
@@ -19,7 +19,7 @@ UDPBeaon::UDPBeaon(IPInfo ip, int broadcastPort, int listeningPort)
     m_broacastPort = broadcastPort;
 }
 
-int UDPBeaon::Initalize()
+int UDPBeacon::Initalize()
 {
     
 #ifdef IBM
@@ -52,7 +52,7 @@ int UDPBeaon::Initalize()
     return 0x00;
 }
 
-int UDPBeaon::SendMessage(json message)
+int UDPBeacon::SendData(json message)
 {
     message.emplace("Time", std::time(nullptr));
     message.emplace("IPAddress", this->GetIPAddress().str_ip);
@@ -70,19 +70,19 @@ int UDPBeaon::SendMessage(json message)
         static_cast<int>(sizeof(ipTarget)));
 }
 
-json UDPBeaon::ReceiveMessage()
+json UDPBeacon::ReceiveMessage()
 {
     return json();
 }
 
-void UDPBeaon::SetIPAddress(IPInfo ip)
+void UDPBeacon::SetIPAddress(IPInfo ip)
 {
     gLock.lock();
         m_ip = ip;
     gLock.unlock();
 }
 
-IPInfo UDPBeaon::GetIPAddress()
+IPInfo UDPBeacon::GetIPAddress()
 {
     gLock.lock();
         IPInfo ip = m_ip;

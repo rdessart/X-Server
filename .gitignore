@@ -1,7 +1,10 @@
 #user defined
+.DS_Store
 .vs
 x64\
 win32\
+build/
+*.ar
 # Prerequisites
 *.d
 
@@ -41,3 +44,11 @@ win32\
 /X-Server.Logging/x64/Release
 /X-Server.Networking/x64/Release
 *.pdb
+/X-Server/x64/Debug
+/X-Server.Manager/x64/Debug
+/XServer.Operations/x64/Debug
+/X-Server.DevOperations/x64/Debug
+
+.fake
+/X-Server.Tester/__pycache__
+/X-Server.Tester/main.log
