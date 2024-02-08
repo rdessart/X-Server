@@ -17,3 +17,9 @@ Network Available API for simulator interaction.
 12. Subscribe dataref (Link a register dataref with a callback)
 13. UnSubscride dataref
 14. Unregister callback
+
+### Planned Feature with this branch 
+
+- [ ] Aquired Aircrafts
+- [ ] Release Aircrafts
+- [ ] Set Aircrafts Count
