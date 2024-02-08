@@ -13,11 +13,7 @@ Network Available API for simulator interaction.
 8. Get registered Dataref Information
 9. LoadDLL call to load DLL of functionality
 10. Realease DLL to detach DLL
-
-
-## Planned Functionality with this branch
- - [x] Create a Getter FlightLoop (a Callback with subscribed datarefs are returned every X Seconds or Frame)
- - [x] Subscribe dataref (Link a register dataref with a callback)
- - [x] UnSubscride dataref
- - [x] Unregister callback
- - [ ] Assign action to the callback
+11. Create a Getter FlightLoop (a Callback with subscribed datarefs are returned every X Seconds or Frame)
+12. Subscribe dataref (Link a register dataref with a callback)
+13. UnSubscride dataref
+14. Unregister callback

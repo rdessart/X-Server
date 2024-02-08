@@ -168,10 +168,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DatarefManager.cpp" />
+    <ClCompile Include="src\FlightLoopManager.cpp" />
     <ClCompile Include="src\Operations.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\DatarefManager.h" />
+    <ClInclude Include="src\FlightLoopManager.h" />
+    <ClInclude Include="src\FlightLoopParameters.h" />
     <ClInclude Include="src\Operations.h" />
     <ClInclude Include="src\SharedValue.h" />
   </ItemGroup>
