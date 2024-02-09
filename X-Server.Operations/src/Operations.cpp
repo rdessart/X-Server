@@ -403,15 +403,16 @@ OPERATION_API void AquirePlanes(Message& message, Manager* manager)
     datarefManager->AddDatarefToMap("TCAS_PITCH"     , "sim/cockpit2/tcas/targets/position/the");
     datarefManager->AddDatarefToMap("TCAS_ROLL"      , "sim/cockpit2/tcas/targets/position/phi");
     datarefManager->AddDatarefToMap("TCAS_HDG"       , "sim/cockpit2/tcas/targets/position/psi");
+    datarefManager->AddDatarefToMap("TCAS_WOW"       , "sim/cockpit2/tcas/targets/position/weight_on_wheels");
     //XP12 AND +
     if (manager->GetSDKVersion() >= 400)
     {
         datarefManager->AddDatarefToMap("TCAS_WING_SPAN", "sim/cockpit2/tcas/targets/wake/wing_span_m");
         datarefManager->AddDatarefToMap("TCAS_WING_AREA", "sim/cockpit2/tcas/targets/wake/wing_area_m2");
-        datarefManager->AddDatarefToMap("TCAS_WAKE_CAT", "sim/cockpit2/tcas/targets/wake/wake_cat");
-        datarefManager->AddDatarefToMap("TCAS_MASS", "sim/cockpit2/tcas/targets/wake/mass_kg");
-        datarefManager->AddDatarefToMap("TCAS_AOA", "sim/cockpit2/tcas/targets/wake/aoa");
-        datarefManager->AddDatarefToMap("TCAS_LIFT", "sim/cockpit2/tcas/targets/wake/lift_N");
+        datarefManager->AddDatarefToMap("TCAS_WAKE_CAT" , "sim/cockpit2/tcas/targets/wake/wake_cat");
+        datarefManager->AddDatarefToMap("TCAS_MASS"     , "sim/cockpit2/tcas/targets/wake/mass_kg");
+        datarefManager->AddDatarefToMap("TCAS_AOA"      , "sim/cockpit2/tcas/targets/wake/aoa");
+        datarefManager->AddDatarefToMap("TCAS_LIFT"     , "sim/cockpit2/tcas/targets/wake/lift_N");
     }
     //Multiplayers : 
     for (int i(1); i <= 19; i++)
@@ -423,7 +424,7 @@ OPERATION_API void AquirePlanes(Message& message, Manager* manager)
         datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_ROLL", "sim/multiplayer/position/plane" + std::to_string(i) + "_phi");
         datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_HDG", "sim/multiplayer/position/plane" + std::to_string(i) + "_psi");
     }
-
+    XPLMSetAircraftModel(1, "Aircraft\\Laminar Research\\Boeing 737-800\\b738.acf");
 }
 
 OPERATION_API void ReleasePlanes(Message& message, Manager* manager)
@@ -440,25 +441,6 @@ OPERATION_API void SetPlanesCount(Message& message, Manager* manager)
 }
 
 OPERATION_API void UpdatePlanes(Message& message, Manager* manager)
-/*
-*     planes : {
-        "ModeS" : [0xFF_FF_FF],
-        "ModeC" : [1234],
-        "FlightId" : ["BEL123"],
-        "IcaoType" : ["A320"],
-        "Position" : [{
-            "Latitude" : 50.0,
-            "Longitude": 5.0,
-            "Elevation" : 100.0,
-        }],
-        "WingSpan" : [35.80],
-        "WingArea" : [122.6],
-        "WakeCat" : [2],
-        "Mass" : [62000],
-        "AOA" : [5.5],
-        "Lift" : [431027.13011943013] #62000 * 9.81 * math.cos(5.5)
-    }
-*/
 {
     json j = message.message["Planes"];
     DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
@@ -469,12 +451,26 @@ OPERATION_API void UpdatePlanes(Message& message, Manager* manager)
         //XP12 AND +
         if (manager->GetSDKVersion() >= 400)
         {
-            datarefManager->GetDatarefByName("TCAS_WING_SPAN")->SetValue(j["WingSpan"], 1);
-            datarefManager->GetDatarefByName("TCAS_WING_AREA")->SetValue(j["WingArea"], 1);
-            datarefManager->GetDatarefByName("TCAS_WAKE_CAT")->SetValue(j["WakeCat"], 1);
-            datarefManager->GetDatarefByName("TCAS_MASS")->SetValue(j["Mass"], 1);
-            datarefManager->GetDatarefByName("TCAS_AOA")->SetValue(j["AOA"], 1);
-            datarefManager->GetDatarefByName("TCAS_LIFT")->SetValue(j["Lift"], 1);
+            auto wingSpan = datarefManager->GetDatarefByName("TCAS_WING_SPAN");
+            wingSpan->SetValue(j["WingSpan"], 1);
+
+            auto wingArea = datarefManager->GetDatarefByName("TCAS_WING_AREA");
+            wingArea->SetValue(j["WingArea"], 1);
+
+            auto wakeCat = datarefManager->GetDatarefByName("TCAS_WAKE_CAT");
+            wakeCat->SetValue(j["WakeCat"], 1);
+
+            auto mass = datarefManager->GetDatarefByName("TCAS_MASS");
+            mass->SetValue(j["Mass"], 1);
+
+            auto aoa = datarefManager->GetDatarefByName("TCAS_AOA");
+            aoa->SetValue(j["AOA"], 1);
+
+            auto lift = datarefManager->GetDatarefByName("TCAS_LIFT");
+            lift->SetValue(j["Lift"], 1);
+
+            auto wow = datarefManager->GetDatarefByName("TCAS_WOW");
+            wow->SetValue(j["OnGround"], 1);
         }
     }
     catch(...)
@@ -482,23 +478,6 @@ OPERATION_API void UpdatePlanes(Message& message, Manager* manager)
         message.message["Result"] = "Error:Dataref weren't loaded did you ask to aquire the plane before this call ?";
         return;
     }
-
-   /* datarefManager->GetDatarefByName("TCAS_CODE_C")->SetValue(j["ModeC"]);
-    std::vector<std::string> flightsId = j["FlightId"].get<std::vector<std::string>>();
-    std::stringstream flightsIdStream;
-    for (auto& id : flightsId)
-    {
-        flightsIdStream << id << "\0";
-    }
-    datarefManager->GetDatarefByName("TCAS_FLIGHT_ID" )->SetValue(flightsIdStream.str());
-
-    std::vector<std::string> icaoTypes = j["IcaoType"].get<std::vector<std::string>>();
-    std::stringstream icaoTypesStream;
-    for (auto& id : icaoTypes)
-    {
-        icaoTypesStream << id << "\0";
-    }
-    datarefManager->GetDatarefByName("TCAS_ICAO_TYPES")->SetValue(icaoTypesStream.str());*/
 
     json positions = j["Positions"];
     json tcasX = json::array();
@@ -528,7 +507,8 @@ OPERATION_API void UpdatePlanes(Message& message, Manager* manager)
         if (i < max)
         {
             std::string name = "PLAYER_" + std::to_string(i) + "_X";
-            try {
+            try
+            {
                 datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_X")->SetValue(oX);
                 datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_Y")->SetValue(oY);
                 datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_Z")->SetValue(oZ);

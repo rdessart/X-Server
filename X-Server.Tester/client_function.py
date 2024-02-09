@@ -18,7 +18,7 @@ def speak(client: UDPClientService) -> None:
     client.sendMessage({"Operation" : "Speak", "Text" : "Hello Python"})
 
 def set_smoke_on(client: UDPClientService) -> None:
-    client.sendMessage({"Operation": "SetData","Dataref" : {"Link" : "sim/operation/failures/rel_smoke_cpit","Value" : 6}})
+    client.sendMessage({"Operation": "SetData","Dataref" : {"Link" : "sim/flightmodel/engine/ENGN_thro","Value" : [1.0, 0.5]}})
 
 def set_smoke_off(client: UDPClientService) -> None:
     client.sendMessage({"Operation": "SetData","Dataref" : {"Link" : "sim/operation/failures/rel_smoke_cpit","Value" : 0}})
@@ -95,11 +95,12 @@ def update_tcas(client: UDPClientService) -> None:
         "Positions" : [{
             "Latitude" : 51.203303,
             "Longitude": 2.898045,
-            "Elevation" : 0.0,
+            "Elevation" : 1.2367,
             "Pitch" : 0.0,
             "Heading" : 255.0,
             "Roll" : 0.0}
             ],
+        "OnGround" : [1],
         "WingSpan" : [35.80],
         "WingArea" : [122.6],
         "WakeCat" : [2],
@@ -124,16 +125,17 @@ def update_tcas(client: UDPClientService) -> None:
         planes["Positions"][0]["Longitude"] = future["lon2"]
         if (velocity >= velocity_max):
             planes["Positions"][0]["Elevation"] += (7.7 * delta_time)
+            planes["OnGround"][0] = 0
         client.sendMessage({"Operation": "UpdatePlanes", "Planes" : planes})
         time.sleep(0.05)
 
 def get_function_map() -> dict:
     return {
-        nameof(load_operations_dll)  : load_operations_dll,         #0
-        nameof(unload_operations_dll): unload_operations_dll,       #1
+        nameof(load_operations_dll)  : load_operations_dll,           #0
+        nameof(unload_operations_dll): unload_operations_dll,         #1
         # nameof(speak): speak,                                       #2
-        nameof(set_smoke_on): set_smoke_on,                         #3
-        nameof(set_smoke_off): set_smoke_off,                       #4
+        nameof(set_smoke_on): set_smoke_on,                           #3
+        nameof(set_smoke_off): set_smoke_off,                         #4
         # nameof(get_smoke_value): get_smoke_value,                   #5
         # nameof(register_dataref): register_dataref,                 #6
         # nameof(set_register_dataref_on): set_register_dataref_on,   #7
