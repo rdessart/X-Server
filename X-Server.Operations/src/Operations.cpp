@@ -389,7 +389,7 @@ OPERATION_API void AquirePlanes(Message& message, Manager* manager)
     }
     Dataref dataref;
     dataref.Load("sim/operation/override/override_TCAS");
-    dataref.SetValue(std::to_string(1));
+    dataref.SetValue(1);
     message.message["Result"] = "Ok";
     //registering dataref
     DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
@@ -400,6 +400,30 @@ OPERATION_API void AquirePlanes(Message& message, Manager* manager)
     datarefManager->AddDatarefToMap("TCAS_X"         , "sim/cockpit2/tcas/targets/position/x");
     datarefManager->AddDatarefToMap("TCAS_Y"         , "sim/cockpit2/tcas/targets/position/y");
     datarefManager->AddDatarefToMap("TCAS_Z"         , "sim/cockpit2/tcas/targets/position/z");
+    datarefManager->AddDatarefToMap("TCAS_PITCH"     , "sim/cockpit2/tcas/targets/position/the");
+    datarefManager->AddDatarefToMap("TCAS_ROLL"      , "sim/cockpit2/tcas/targets/position/phi");
+    datarefManager->AddDatarefToMap("TCAS_HDG"       , "sim/cockpit2/tcas/targets/position/psi");
+    //XP12 AND +
+    if (manager->GetSDKVersion() >= 400)
+    {
+        datarefManager->AddDatarefToMap("TCAS_WING_SPAN", "sim/cockpit2/tcas/targets/wake/wing_span_m");
+        datarefManager->AddDatarefToMap("TCAS_WING_AREA", "sim/cockpit2/tcas/targets/wake/wing_area_m2");
+        datarefManager->AddDatarefToMap("TCAS_WAKE_CAT", "sim/cockpit2/tcas/targets/wake/wake_cat");
+        datarefManager->AddDatarefToMap("TCAS_MASS", "sim/cockpit2/tcas/targets/wake/mass_kg");
+        datarefManager->AddDatarefToMap("TCAS_AOA", "sim/cockpit2/tcas/targets/wake/aoa");
+        datarefManager->AddDatarefToMap("TCAS_LIFT", "sim/cockpit2/tcas/targets/wake/lift_N");
+    }
+    //Multiplayers : 
+    for (int i(1); i <= 19; i++)
+    {
+        datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_X", "sim/multiplayer/position/plane" + std::to_string(i) + "_x");
+        datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_Y", "sim/multiplayer/position/plane" + std::to_string(i) + "_y");
+        datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_Z", "sim/multiplayer/position/plane" + std::to_string(i) + "_z");
+        datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_PITCH", "sim/multiplayer/position/plane" + std::to_string(i) + "_the");
+        datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_ROLL", "sim/multiplayer/position/plane" + std::to_string(i) + "_phi");
+        datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_HDG", "sim/multiplayer/position/plane" + std::to_string(i) + "_psi");
+    }
+
 }
 
 OPERATION_API void ReleasePlanes(Message& message, Manager* manager)
@@ -410,7 +434,8 @@ OPERATION_API void ReleasePlanes(Message& message, Manager* manager)
 
 OPERATION_API void SetPlanesCount(Message& message, Manager* manager)
 {
-    XPLMSetActiveAircraftCount(message.message["Count"].get<int>());
+    int count = message.message["Count"].get<int>();
+    XPLMSetActiveAircraftCount(count);
     message.message["Result"] = "Ok";
 }
 
@@ -437,9 +462,28 @@ OPERATION_API void UpdatePlanes(Message& message, Manager* manager)
 {
     json j = message.message["Planes"];
     DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
-    AbstractDataref* dataref = datarefManager->GetDatarefByName("TCAS_IDENT_S");
-    dataref->SetValue(j["ModeS"]);
-    datarefManager->GetDatarefByName("TCAS_CODE_C"    )->SetValue(j["ModeC"]);
+
+    try {
+        datarefManager->GetDatarefByName("TCAS_IDENT_S")->SetValue(j["ModeS"], 1);
+        datarefManager->GetDatarefByName("TCAS_CODE_C")->SetValue(j["ModeC"], 1);
+        //XP12 AND +
+        if (manager->GetSDKVersion() >= 400)
+        {
+            datarefManager->GetDatarefByName("TCAS_WING_SPAN")->SetValue(j["WingSpan"], 1);
+            datarefManager->GetDatarefByName("TCAS_WING_AREA")->SetValue(j["WingArea"], 1);
+            datarefManager->GetDatarefByName("TCAS_WAKE_CAT")->SetValue(j["WakeCat"], 1);
+            datarefManager->GetDatarefByName("TCAS_MASS")->SetValue(j["Mass"], 1);
+            datarefManager->GetDatarefByName("TCAS_AOA")->SetValue(j["AOA"], 1);
+            datarefManager->GetDatarefByName("TCAS_LIFT")->SetValue(j["Lift"], 1);
+        }
+    }
+    catch(...)
+    {
+        message.message["Result"] = "Error:Dataref weren't loaded did you ask to aquire the plane before this call ?";
+        return;
+    }
+
+   /* datarefManager->GetDatarefByName("TCAS_CODE_C")->SetValue(j["ModeC"]);
     std::vector<std::string> flightsId = j["FlightId"].get<std::vector<std::string>>();
     std::stringstream flightsIdStream;
     for (auto& id : flightsId)
@@ -454,26 +498,59 @@ OPERATION_API void UpdatePlanes(Message& message, Manager* manager)
     {
         icaoTypesStream << id << "\0";
     }
-    datarefManager->GetDatarefByName("TCAS_ICAO_TYPES")->SetValue(icaoTypesStream.str());
+    datarefManager->GetDatarefByName("TCAS_ICAO_TYPES")->SetValue(icaoTypesStream.str());*/
 
-    std::vector<json> positions = j["Positions"].get<std::vector<json>>();
+    json positions = j["Positions"];
     json tcasX = json::array();
     json tcasY = json::array();
     json tcasZ = json::array();
-    for (auto& pos : positions)
+    json tcasPitch = json::array();
+    json tcasHdg = json::array();
+    json tcasRoll = json::array();
+    int max = 19;
+    int i = 1;
+    for (json::iterator it = positions.begin(); it != positions.end(); it++)
     {
-        double latitude = pos["Latitude"].get<double>();
-        double longitude = pos["Longitude"].get<double>();
-        double elevation = pos["Elevation"].get<double>();
-        double oX, oY, oZ;
+        double latitude  = (*it)["Latitude" ].get<double>();
+        double longitude = (*it)["Longitude"].get<double>();
+        double elevation = (*it)["Elevation"].get<double>();
+        double pitch     = (*it)["Pitch"].get<double>();
+        double hdg       = (*it)["Heading"].get<double>();
+        double roll      = (*it)["Roll"].get<double>();
+        double oX(0.0), oY(0.0), oZ(0.0);
         XPLMWorldToLocal(latitude, longitude, elevation, &oX, &oY, &oZ);
-        tcasX.push_back(std::to_string(oX));
-        tcasY.push_back(std::to_string(oY));
-        tcasZ.push_back(std::to_string(oZ));
+        tcasX.push_back(oX);
+        tcasY.push_back(oY);
+        tcasZ.push_back(oZ);
+        tcasPitch.push_back(pitch);
+        tcasHdg.push_back(hdg);
+        tcasRoll.push_back(roll);
+        if (i < max)
+        {
+            std::string name = "PLAYER_" + std::to_string(i) + "_X";
+            try {
+                datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_X")->SetValue(oX);
+                datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_Y")->SetValue(oY);
+                datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_Z")->SetValue(oZ);
+                datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_PITCH")->SetValue(pitch);
+                datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_ROLL")->SetValue(hdg);
+                datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_HDG")->SetValue(roll);
+            }
+            catch (...)
+            {
+                continue;
+            }
+        }
+        i++;
     }
 
-    datarefManager->GetDatarefByName("TCAS_X"         )->SetValue(tcasX);
-    datarefManager->GetDatarefByName("TCAS_Y"         )->SetValue(tcasY);
-    datarefManager->GetDatarefByName("TCAS_Z"         )->SetValue(tcasZ);
+    datarefManager->GetDatarefByName("TCAS_X")->SetValue(tcasX, 1);
+    datarefManager->GetDatarefByName("TCAS_Y")->SetValue(tcasY, 1);
+    datarefManager->GetDatarefByName("TCAS_Z")->SetValue(tcasZ, 1);
+    datarefManager->GetDatarefByName("TCAS_PITCH")->SetValue(tcasPitch, 1);
+    datarefManager->GetDatarefByName("TCAS_ROLL")->SetValue(tcasHdg, 1);
+    datarefManager->GetDatarefByName("TCAS_HDG")->SetValue(tcasRoll, 1);
+
+
     return;
 }

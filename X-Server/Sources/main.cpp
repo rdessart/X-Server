@@ -38,7 +38,7 @@ static std::string AcfAuthor;
 static std::string AcfDescription;
 static int SimVersion, SDKVersion;
 
-static Manager manager = Manager();
+static Manager manager;
 
 
 static XPLMMenuID eSkyInstructorMenu;
@@ -63,6 +63,9 @@ PLUGIN_API int XPluginStart(char* outName, char* outSig, char* outDesc)
 	{
 		logger.Log("Unable to create X-Server Submenu");
 	}
+	XPLMHostApplicationID id;
+	XPLMGetVersions(&SimVersion, &SDKVersion, &id);
+	manager = Manager(SDKVersion);
 	XPLMCreateFlightLoop_t initalizerParameter;
 	initalizerParameter.structSize = sizeof(XPLMCreateFlightLoop_t);
 	initalizerParameter.phase = xplm_FlightLoop_Phase_BeforeFlightModel;
@@ -79,6 +82,7 @@ PLUGIN_API int XPluginStart(char* outName, char* outSig, char* outDesc)
 	beaconCallbackId = XPLMCreateFlightLoop(&beaconCallbackParameter);
 
 	XPLMScheduleFlightLoop(initalizerCallbackId, -1, 0);
+
 	return 1;
 }
 
@@ -135,8 +139,8 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 
 	AcfAuthor = d1.GetValue();
 	AcfDescription = d2.GetValue();
-	XPLMHostApplicationID id;
-	XPLMGetVersions(&SimVersion, &SDKVersion, &id);
+	
+	
 	int res = beacon.Initalize();
 	logger.Log("UDP Beacon initalizer returned " + std::to_string(res));
 	XPLMScheduleFlightLoop(beaconCallbackId, -1, 0);

@@ -4,8 +4,12 @@
 #include "AbstractDataref.h"
 
 #include "../Tools/SharedValue.h"
-#include <Logger.h>
 #include "../Tools/Utils.h"
+
+#include <Logger.h>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 class FFDataref :
     public AbstractDataref
@@ -32,15 +36,10 @@ public:
 	bool Load(std::string path);
 	FFDataref::Type GetType();
 	FFDataref::Type LoadType();
-	std::string GetValue() const;
-	// ATTENTION this would set the target value (value to be set at the next call of the callback)
-	void SetValue(json value) const;
-#pragma region disabled
-	//void SetTargetValue(); // to be called into the sync loop
-#pragma endregion
+	json GetValue() const;
+	void SetValue(json value, int offset = 0) const;
 	void BindAPI(SharedValuesInterface* FF_A320_api);
 	void SetConversionFactor(json conversionFactor);
-	//void DoSetValue(std::string value);
 	std::string GetTargetValue();
 	int GetID() const;
 	int GetFlag() const;

@@ -96,7 +96,7 @@ public:
 	///</summary>
 	///<param name="value">The value to be sent to the dataref (as JSON)</param>
 	// void SetValue(std::string value) const;
-	void SetValue(json value) const;
+	void SetValue(json value, int offset = 0) const;
 	///<summary>
 	/// Set a conversion factor to a dataref.
 	///</summary>

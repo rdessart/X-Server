@@ -2,6 +2,7 @@ import math
 from udp_client_service import UDPClientService
 import time
 from varname import nameof
+from geographiclib.geodesic import Geodesic
 
 CALLBACK_ID = 2847554231936
 def get_loaded_function(client: UDPClientService) ->None:
@@ -17,10 +18,10 @@ def speak(client: UDPClientService) -> None:
     client.sendMessage({"Operation" : "Speak", "Text" : "Hello Python"})
 
 def set_smoke_on(client: UDPClientService) -> None:
-    client.sendMessage({"Operation": "SetData","Dataref" : {"Link" : "sim/operation/failures/rel_smoke_cpit","Value" : "6"}})
+    client.sendMessage({"Operation": "SetData","Dataref" : {"Link" : "sim/operation/failures/rel_smoke_cpit","Value" : 6}})
 
 def set_smoke_off(client: UDPClientService) -> None:
-    client.sendMessage({"Operation": "SetData","Dataref" : {"Link" : "sim/operation/failures/rel_smoke_cpit","Value" : "0"}})
+    client.sendMessage({"Operation": "SetData","Dataref" : {"Link" : "sim/operation/failures/rel_smoke_cpit","Value" : 0}})
 
 def get_smoke_value(client: UDPClientService) -> None:
     client.sendMessage({"Operation": "GetData","Dataref" : { "Link" : "sim/operation/failures/rel_smoke_cpit"}})
@@ -82,35 +83,57 @@ def release_planes(client: UDPClientService) -> None:
     client.sendMessage({"Operation": "ReleasePlanes"})
 
 def set_plane_count(client: UDPClientService) -> None:
-    client.sendMessage({"Operation": "setplanecount", "Count": 2})
+    client.sendMessage({"Operation": "setplanecount", "Count": 30})
 
 def update_tcas(client: UDPClientService) -> None:
+    
     planes = {
-        "ModeS" : [0xFF_FF_FF],
+        "ModeS" : [0x00_00_01, 0x00_00_02, 0x00_00_03, 0x00_00_04],
         "ModeC" : [1234],
         "FlightId" : ["BEL123"],
         "IcaoType" : ["A320"],
-        "Position" : [{
-            "Latitude" : 50.0,
-            "Longitude": 5.0,
-            "Elevation" : 100.0,
-        }],
+        "Positions" : [{
+            "Latitude" : 51.203303,
+            "Longitude": 2.898045,
+            "Elevation" : 0.0,
+            "Pitch" : 0.0,
+            "Heading" : 255.0,
+            "Roll" : 0.0}
+            ],
         "WingSpan" : [35.80],
         "WingArea" : [122.6],
         "WakeCat" : [2],
         "Mass" : [62000],
         "AOA" : [5.5],
-        "Lift" : [431027.13011943013] #62000 * 9.81 * math.cos(5.5)
+        "Lift" : [431027.13011943013], #62000 * 9.81 * math.cos(5.5)
+
     }
-    client.sendMessage({"Operation": "UpdatePlanes", "Planes" : planes})
+
+    velocity: float = 0
+    velocity_max : float = 72.0
+    elevation_max: float = 457.2
+    acceleration: float = 2.0
+    delta_time:float = 0.05
+    # track:float = 255.0 
+    while planes["Positions"][0]["Elevation"] < elevation_max:
+        if(velocity < velocity_max):
+            velocity = velocity + (acceleration * delta_time)
+        distance = velocity * delta_time
+        future = Geodesic.WGS84.Direct(planes["Positions"][0]["Latitude"], planes["Positions"][0]["Longitude"], planes["Positions"][0]["Heading"], distance)
+        planes["Positions"][0]["Latitude"] = future["lat2"]
+        planes["Positions"][0]["Longitude"] = future["lon2"]
+        if (velocity >= velocity_max):
+            planes["Positions"][0]["Elevation"] += (7.7 * delta_time)
+        client.sendMessage({"Operation": "UpdatePlanes", "Planes" : planes})
+        time.sleep(0.05)
 
 def get_function_map() -> dict:
     return {
         nameof(load_operations_dll)  : load_operations_dll,         #0
         nameof(unload_operations_dll): unload_operations_dll,       #1
         # nameof(speak): speak,                                       #2
-        # nameof(set_smoke_on): set_smoke_on,                         #3
-        # nameof(set_smoke_off): set_smoke_off,                       #4
+        nameof(set_smoke_on): set_smoke_on,                         #3
+        nameof(set_smoke_off): set_smoke_off,                       #4
         # nameof(get_smoke_value): get_smoke_value,                   #5
         # nameof(register_dataref): register_dataref,                 #6
         # nameof(set_register_dataref_on): set_register_dataref_on,   #7

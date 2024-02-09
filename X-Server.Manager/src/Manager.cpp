@@ -4,7 +4,15 @@
 
 #define NAMEOF(name) #name
 Manager::Manager():
-	m_logger("X-Server.log", "Manager", false)
+	m_logger("X-Server.log", "Manager", false),
+	m_SDKVersion(-1)
+{
+	m_serviceMap.emplace(NAMEOF(OperationManager), new OperationManager());
+}
+
+Manager::Manager(int sdkVersion):
+	m_logger("X-Server.log", "Manager", false),
+	m_SDKVersion(sdkVersion)
 {
 	m_serviceMap.emplace(NAMEOF(OperationManager), new OperationManager());
 }
@@ -64,4 +72,14 @@ UDPServer* Manager::GetServer()
 Logger* Manager::GetLogger()
 {
 	return &m_logger;
+}
+
+int Manager::GetSDKVersion()
+{
+	return m_SDKVersion;
+}
+
+void Manager::SetSDKVersion(int version)
+{
+	m_SDKVersion = version;
 }

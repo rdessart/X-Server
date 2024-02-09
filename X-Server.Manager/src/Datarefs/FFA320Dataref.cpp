@@ -52,7 +52,7 @@ FFDataref::Type FFDataref::LoadType()
 	return m_type;
 }
 
-std::string FFDataref::GetValue() const
+json FFDataref::GetValue() const
 {
 	m_logger.Log("FFDATAREF GetValue");
 	if (m_ffapi == nullptr) {
@@ -122,7 +122,8 @@ std::string FFDataref::GetValue() const
 		if (lenght <= 0) return "";
 		void* buffer = malloc(sizeof(char));
 		m_ffapi->ValueGet(m_id, buffer);
-		auto str = (char*)malloc(lenght + 1);
+		char* str = (char*)malloc(lenght + 1);
+		if (str == nullptr) return "";
 		memset(str, 0x00, static_cast<size_t>(lenght+ 1));
 #ifdef IBM
 		memcpy_s(str, lenght, buffer, lenght);
@@ -139,64 +140,7 @@ std::string FFDataref::GetValue() const
 	}
 }
 
-//void FFDataref::SetValue(std::string value)
-//{
-//	m_targetValue = value;
-//	m_needUpdate = true;
-//}
-
-// void FFDataref::SetValue(std::string value) const
-// {
-// 	m_logger.Log("[DO_SET_VALUE]" + m_link + " Setting value to " + value);
-// 	int type = m_ffapi->ValueType(m_id);
-// 	if (type == Value_Type_float32)
-// 	{
-// 		m_logger.Log("[DO_SET_VALUE]" + m_link + " Type is  " + std::to_string(type) + " (float32)");
-// 		float val(0.0f);
-// 		try
-// 		{
-// 			val = std::stof(value);
-// 		}
-// 		catch (std::invalid_argument)
-// 		{
-// 			m_logger.Log("[DO_SET_VALUE]" + m_link + " std::stof has crashed because of an invalid argument", Logger::Severity::CRITICAL);
-// 			return;
-// 		}
-// 		m_ffapi->ValueSet(m_id, &val);
-// 	}
-// 	else if (type == Value_Type_float64)
-// 	{
-// 		m_logger.Log("[DO_SET_VALUE]" + m_link + " Type is  " + std::to_string(type) + " (float64)");
-// 		double val(0.0);
-// 		try
-// 		{
-// 			val = std::stod(value);
-// 		}
-// 		catch (std::invalid_argument)
-// 		{
-// 			m_logger.Log("[DO_SET_VALUE]" + m_link + " std::stof has crashed because of an invalid argument", Logger::Severity::CRITICAL);
-// 			return;
-// 		}
-// 		m_ffapi->ValueSet(m_id, &val);
-// 	}
-// 	else if (type == Value_Type_sint32)
-// 	{
-// 		m_logger.Log("[DO_SET_VALUE]" + m_link + " Type is  " + std::to_string(type) + " (sint32)");
-// 		int val(0);
-// 		try
-// 		{
-// 			val = std::stoi(value);
-// 		}
-// 		catch (std::invalid_argument)
-// 		{
-// 			m_logger.Log("[DO_SET_VALUE]" + m_link + " std::stof has crashed because of an invalid argument", Logger::Severity::CRITICAL);
-// 			return;
-// 		}
-// 		m_ffapi->ValueSet(m_id, &val);
-// 	}
-// }
-
-void FFDataref::SetValue(json value) const
+void FFDataref::SetValue(json value, int offset) const
 {
 	m_logger.Log("[DO_SET_VALUE]" + m_link + " Setting value to " + value.get<std::string>());
 	int type = m_ffapi->ValueType(m_id);

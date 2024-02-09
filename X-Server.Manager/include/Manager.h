@@ -8,6 +8,7 @@ class Manager
 {
 public:
 	Manager();
+	Manager(int sdkVersion);
 	~Manager();
 
 	size_t AddService(std::string name, void* servicePtr);
@@ -16,10 +17,12 @@ public:
 	bool IsServiceAvailable(std::string name);
 	UDPServer* GetServer();
 	Logger* GetLogger();
-
+	int GetSDKVersion();
+	void SetSDKVersion(int version);
 protected:
 	UDPServer m_networking;
 	Logger m_logger;
 	std::map<std::string, void*> m_serviceMap;
+	int m_SDKVersion;
 };
 
