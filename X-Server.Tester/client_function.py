@@ -83,51 +83,38 @@ def release_planes(client: UDPClientService) -> None:
     client.sendMessage({"Operation": "ReleasePlanes"})
 
 def set_plane_count(client: UDPClientService) -> None:
-    client.sendMessage({"Operation": "setplanecount", "Count": 30})
+    client.sendMessage({"Operation": "setplanecount", "Count": 2})
+
+def register_plane(client: UDPClientService) -> None:
+    client.sendMessage({"Operation": "registerplane", "AircraftModel" : "E:\\X-Plane 11\\Aircraft\\Laminar Research\\Boeing B737-800\\b738.acf"})
 
 def update_tcas(client: UDPClientService) -> None:
-    
-    planes = {
-        "ModeS" : [0x00_00_01, 0x00_00_02, 0x00_00_03, 0x00_00_04],
-        "ModeC" : [1234],
-        "FlightId" : ["BEL123"],
-        "IcaoType" : ["A320"],
-        "Positions" : [{
-            "Latitude" : 51.203303,
-            "Longitude": 2.898045,
-            "Elevation" : 1.2367,
-            "Pitch" : 0.0,
-            "Heading" : 255.0,
-            "Roll" : 0.0}
-            ],
-        "OnGround" : [1],
-        "WingSpan" : [35.80],
-        "WingArea" : [122.6],
-        "WakeCat" : [2],
-        "Mass" : [62000],
-        "AOA" : [5.5],
-        "Lift" : [431027.13011943013], #62000 * 9.81 * math.cos(5.5)
-
-    }
-
-    velocity: float = 0
-    velocity_max : float = 72.0
-    elevation_max: float = 457.2
-    acceleration: float = 2.0
-    delta_time:float = 0.05
-    # track:float = 255.0 
-    while planes["Positions"][0]["Elevation"] < elevation_max:
-        if(velocity < velocity_max):
-            velocity = velocity + (acceleration * delta_time)
-        distance = velocity * delta_time
-        future = Geodesic.WGS84.Direct(planes["Positions"][0]["Latitude"], planes["Positions"][0]["Longitude"], planes["Positions"][0]["Heading"], distance)
-        planes["Positions"][0]["Latitude"] = future["lat2"]
-        planes["Positions"][0]["Longitude"] = future["lon2"]
-        if (velocity >= velocity_max):
-            planes["Positions"][0]["Elevation"] += (7.7 * delta_time)
-            planes["OnGround"][0] = 0
-        client.sendMessage({"Operation": "UpdatePlanes", "Planes" : planes})
-        time.sleep(0.05)
+    # velocity: float = 0
+    # velocity_max : float = 72.0
+    # elevation_max: float = 457.2
+    # acceleration: float = 2.0
+    # delta_time:float = 0.05
+    # # track:float = 255.0 
+    # while planes["Positions"][0]["Elevation"] < elevation_max:
+    #     if(velocity < velocity_max):
+    #         velocity = velocity + (acceleration * delta_time)
+    #     distance = velocity * delta_time
+    #     future = Geodesic.WGS84.Direct(planes["Positions"][0]["Latitude"], planes["Positions"][0]["Longitude"], planes["Positions"][0]["Heading"], distance)
+    #     planes["Positions"][0]["Latitude"] = future["lat2"]
+    #     planes["Positions"][0]["Longitude"] = future["lon2"]
+    #     if (velocity >= velocity_max):
+    #         planes["Positions"][0]["Elevation"] += (7.7 * delta_time)
+    #         planes["OnGround"][0] = 0
+    # for i in range(int(10.0 *  (1.0 / 0.05))):
+    client.sendMessage({"Operation": "updateplane",
+                        "AircraftId" : 1,
+                        "Latitude" : 51.203249,
+                        "Longitude": 2.89623,
+                        "Elevation" : 5.256982,
+                        "Pitch" : 0.0,
+                        "Heading" : 255.0,
+                        "Roll" : 0.0 })
+        # time.sleep(0.05)
 
 def get_function_map() -> dict:
     return {
@@ -147,8 +134,9 @@ def get_function_map() -> dict:
         # nameof(get_loaded_function): get_loaded_function,           #13
         # nameof(load_beta_dll): load_beta_dll,                       #14
         # nameof(unload_beta_dll): unload_beta_dll,                   #15 
-        nameof(aquire_planes): aquire_planes,                       #16
-        nameof(release_planes): release_planes,                     #17 
-        nameof(set_plane_count): set_plane_count,                   #18   
-        nameof(update_tcas): update_tcas,                           #19   
+        nameof(aquire_planes): aquire_planes,                         #16
+        nameof(set_plane_count): set_plane_count,                     #17   
+        nameof(register_plane): register_plane,                       #18   
+        nameof(release_planes): release_planes,                       #19 
+        nameof(update_tcas): update_tcas,                             #20   
     }

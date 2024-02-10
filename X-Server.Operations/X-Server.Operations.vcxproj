@@ -71,16 +71,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>C:\X-Plane 12\</OutDir>
+    <OutDir>E:\X-Plane 11\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>C:\X-Plane 12\</OutDir>
+    <OutDir>E:\X-Plane 11\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>C:\X-Plane 12\</OutDir>
+    <OutDir>E:\X-Plane 11\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>C:\X-Plane 12\</OutDir>
+    <OutDir>E:\X-Plane 11\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -173,11 +173,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AircraftManager.cpp" />
     <ClCompile Include="src\DatarefManager.cpp" />
     <ClCompile Include="src\FlightLoopManager.cpp" />
     <ClCompile Include="src\Operations.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\AircraftManager.h" />
     <ClInclude Include="src\DatarefManager.h" />
     <ClInclude Include="src\FlightLoopManager.h" />
     <ClInclude Include="src\FlightLoopParameters.h" />

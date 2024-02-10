@@ -27,6 +27,9 @@
     <ClCompile Include="src\FlightLoopManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\AircraftManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Operations.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\FlightLoopParameters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\AircraftManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

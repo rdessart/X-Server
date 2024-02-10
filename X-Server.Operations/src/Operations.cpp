@@ -8,12 +8,14 @@
 #include <XPLM/XPLMPlanes.h>
 #include <XPLM/XPLMGraphics.h>
 
+#include "AircraftManager.h"
 #define NAMEOF(name) #name
 
 OPERATION_API int InitializeDLL(Manager* manager)
 {
     manager->AddService(NAMEOF(FlightLoopManager), new FlightLoopManager());
     manager->AddService(NAMEOF(DatarefManager), new DatarefManager(true));
+    manager->AddService(NAMEOF(AircraftManager), new AircraftManager());
     return 1;
 }
 
@@ -26,6 +28,10 @@ OPERATION_API int UninitializeDLL(Manager* manager)
     FlightLoopManager* flightloopService = static_cast<FlightLoopManager*>(manager->GetService(NAMEOF(FlightLoopManager)));
     delete flightloopService;
     manager->RemoveService(NAMEOF(FlightLoopManager));
+
+    AircraftManager* aircraftManager = static_cast<AircraftManager*>(manager->GetService(NAMEOF(AircraftManager)));
+    delete aircraftManager;
+    manager->RemoveService(NAMEOF(AircraftManager));
 
     return EXIT_SUCCESS;
 }
@@ -49,7 +55,9 @@ OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNa
     operationsNames->emplace("aquireplanes",    NAMEOF(AquirePlanes));
     operationsNames->emplace("releaseplanes",   NAMEOF(ReleasePlanes));
     operationsNames->emplace("setplanecount",   NAMEOF(SetPlanesCount));
-    operationsNames->emplace("updateplanes",   NAMEOF(UpdatePlanes));
+    operationsNames->emplace("registerplane",   NAMEOF(RegisterPlane));
+    operationsNames->emplace("unregisterplane", NAMEOF(UnregisterPlane));
+    operationsNames->emplace("updateplane",     NAMEOF(UpdatePlane));
     return (int)(operationsNames->size() - sizeBefore);
 }
 
@@ -380,157 +388,74 @@ OPERATION_API void UnregisterFlightLoopOperation(Message& m, Manager* manager)
 
 OPERATION_API void AquirePlanes(Message& message, Manager* manager)
 {
-    //TODO: check if we can pass a callback to be called when we have plane acess.
-    int res = XPLMAcquirePlanes(nullptr, nullptr, nullptr);
-    if (!res)
+    AircraftManager* aircraftManager = static_cast<AircraftManager*>(manager->GetService(NAMEOF(AircraftManager)));
+    if (!aircraftManager->AquireAircrafts())
     {
-        message.message["Result"] = "Error:Unable to get plane aquisition()";
-        return;
+        message.message["Result"] = "Error:Unable to aquire aircraft";
     }
-    Dataref dataref;
-    dataref.Load("sim/operation/override/override_TCAS");
-    dataref.SetValue(1);
     message.message["Result"] = "Ok";
-    //registering dataref
-    DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
-    datarefManager->AddDatarefToMap("TCAS_IDENT_S"   , "sim/cockpit2/tcas/targets/modeS_id");
-    datarefManager->AddDatarefToMap("TCAS_CODE_C"    , "sim/cockpit2/tcas/targets/modeC_code");
-    datarefManager->AddDatarefToMap("TCAS_FLIGHT_ID" , "sim/cockpit2/tcas/targets/flight_id");
-    datarefManager->AddDatarefToMap("TCAS_ICAO_TYPES", "sim/cockpit2/tcas/targets/icao_type");
-    datarefManager->AddDatarefToMap("TCAS_X"         , "sim/cockpit2/tcas/targets/position/x");
-    datarefManager->AddDatarefToMap("TCAS_Y"         , "sim/cockpit2/tcas/targets/position/y");
-    datarefManager->AddDatarefToMap("TCAS_Z"         , "sim/cockpit2/tcas/targets/position/z");
-    datarefManager->AddDatarefToMap("TCAS_PITCH"     , "sim/cockpit2/tcas/targets/position/the");
-    datarefManager->AddDatarefToMap("TCAS_ROLL"      , "sim/cockpit2/tcas/targets/position/phi");
-    datarefManager->AddDatarefToMap("TCAS_HDG"       , "sim/cockpit2/tcas/targets/position/psi");
-    datarefManager->AddDatarefToMap("TCAS_WOW"       , "sim/cockpit2/tcas/targets/position/weight_on_wheels");
-    //XP12 AND +
-    if (manager->GetSDKVersion() >= 400)
-    {
-        datarefManager->AddDatarefToMap("TCAS_WING_SPAN", "sim/cockpit2/tcas/targets/wake/wing_span_m");
-        datarefManager->AddDatarefToMap("TCAS_WING_AREA", "sim/cockpit2/tcas/targets/wake/wing_area_m2");
-        datarefManager->AddDatarefToMap("TCAS_WAKE_CAT" , "sim/cockpit2/tcas/targets/wake/wake_cat");
-        datarefManager->AddDatarefToMap("TCAS_MASS"     , "sim/cockpit2/tcas/targets/wake/mass_kg");
-        datarefManager->AddDatarefToMap("TCAS_AOA"      , "sim/cockpit2/tcas/targets/wake/aoa");
-        datarefManager->AddDatarefToMap("TCAS_LIFT"     , "sim/cockpit2/tcas/targets/wake/lift_N");
-    }
-    //Multiplayers : 
-    for (int i(1); i <= 19; i++)
-    {
-        datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_X", "sim/multiplayer/position/plane" + std::to_string(i) + "_x");
-        datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_Y", "sim/multiplayer/position/plane" + std::to_string(i) + "_y");
-        datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_Z", "sim/multiplayer/position/plane" + std::to_string(i) + "_z");
-        datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_PITCH", "sim/multiplayer/position/plane" + std::to_string(i) + "_the");
-        datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_ROLL", "sim/multiplayer/position/plane" + std::to_string(i) + "_phi");
-        datarefManager->AddDatarefToMap("PLAYER_" + std::to_string(i) + "_HDG", "sim/multiplayer/position/plane" + std::to_string(i) + "_psi");
-    }
-    XPLMSetAircraftModel(1, "Aircraft\\Laminar Research\\Boeing 737-800\\b738.acf");
 }
-
 OPERATION_API void ReleasePlanes(Message& message, Manager* manager)
 {
-    XPLMReleasePlanes();
+    AircraftManager* aircraftManager = static_cast<AircraftManager*>(manager->GetService(NAMEOF(AircraftManager)));
+    aircraftManager->ReleaseAircrafs();
     message.message["Result"] = "Ok";
 }
 
-OPERATION_API void SetPlanesCount(Message& message, Manager* manager)
+OPERATION_API void SetPlanesCount(Message& message, Manager* manager) 
 {
-    int count = message.message["Count"].get<int>();
-    XPLMSetActiveAircraftCount(count);
+    AircraftManager* aircraftManager = static_cast<AircraftManager*>(manager->GetService(NAMEOF(AircraftManager)));
+    aircraftManager->SetPlaneCount(message.message["Count"].get<int>());
     message.message["Result"] = "Ok";
 }
 
-OPERATION_API void UpdatePlanes(Message& message, Manager* manager)
+OPERATION_API void RegisterPlane(Message& message, Manager* manager)
 {
-    json j = message.message["Planes"];
-    DatarefManager* datarefManager = static_cast<DatarefManager*>(manager->GetService(NAMEOF(DatarefManager)));
+    AircraftManager* aircraftManager = static_cast<AircraftManager*>(manager->GetService(NAMEOF(AircraftManager)));
+    int id = aircraftManager->RegisterAircraft(message.message["AircraftModel"].get<std::string>());
+    message.message["AircraftId"] = id;
+    message.message["Result"] = "Ok";
+}
 
-    try {
-        datarefManager->GetDatarefByName("TCAS_IDENT_S")->SetValue(j["ModeS"], 1);
-        datarefManager->GetDatarefByName("TCAS_CODE_C")->SetValue(j["ModeC"], 1);
-        //XP12 AND +
-        if (manager->GetSDKVersion() >= 400)
-        {
-            auto wingSpan = datarefManager->GetDatarefByName("TCAS_WING_SPAN");
-            wingSpan->SetValue(j["WingSpan"], 1);
-
-            auto wingArea = datarefManager->GetDatarefByName("TCAS_WING_AREA");
-            wingArea->SetValue(j["WingArea"], 1);
-
-            auto wakeCat = datarefManager->GetDatarefByName("TCAS_WAKE_CAT");
-            wakeCat->SetValue(j["WakeCat"], 1);
-
-            auto mass = datarefManager->GetDatarefByName("TCAS_MASS");
-            mass->SetValue(j["Mass"], 1);
-
-            auto aoa = datarefManager->GetDatarefByName("TCAS_AOA");
-            aoa->SetValue(j["AOA"], 1);
-
-            auto lift = datarefManager->GetDatarefByName("TCAS_LIFT");
-            lift->SetValue(j["Lift"], 1);
-
-            auto wow = datarefManager->GetDatarefByName("TCAS_WOW");
-            wow->SetValue(j["OnGround"], 1);
-        }
-    }
-    catch(...)
-    {
-        message.message["Result"] = "Error:Dataref weren't loaded did you ask to aquire the plane before this call ?";
-        return;
-    }
-
-    json positions = j["Positions"];
-    json tcasX = json::array();
-    json tcasY = json::array();
-    json tcasZ = json::array();
-    json tcasPitch = json::array();
-    json tcasHdg = json::array();
-    json tcasRoll = json::array();
-    int max = 19;
-    int i = 1;
-    for (json::iterator it = positions.begin(); it != positions.end(); it++)
-    {
-        double latitude  = (*it)["Latitude" ].get<double>();
-        double longitude = (*it)["Longitude"].get<double>();
-        double elevation = (*it)["Elevation"].get<double>();
-        double pitch     = (*it)["Pitch"].get<double>();
-        double hdg       = (*it)["Heading"].get<double>();
-        double roll      = (*it)["Roll"].get<double>();
-        double oX(0.0), oY(0.0), oZ(0.0);
-        XPLMWorldToLocal(latitude, longitude, elevation, &oX, &oY, &oZ);
-        tcasX.push_back(oX);
-        tcasY.push_back(oY);
-        tcasZ.push_back(oZ);
-        tcasPitch.push_back(pitch);
-        tcasHdg.push_back(hdg);
-        tcasRoll.push_back(roll);
-        if (i < max)
-        {
-            std::string name = "PLAYER_" + std::to_string(i) + "_X";
-            try
-            {
-                datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_X")->SetValue(oX);
-                datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_Y")->SetValue(oY);
-                datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_Z")->SetValue(oZ);
-                datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_PITCH")->SetValue(pitch);
-                datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_ROLL")->SetValue(hdg);
-                datarefManager->GetDatarefByName("PLAYER_" + std::to_string(i) + "_HDG")->SetValue(roll);
-            }
-            catch (...)
-            {
-                continue;
-            }
-        }
-        i++;
-    }
-
-    datarefManager->GetDatarefByName("TCAS_X")->SetValue(tcasX, 1);
-    datarefManager->GetDatarefByName("TCAS_Y")->SetValue(tcasY, 1);
-    datarefManager->GetDatarefByName("TCAS_Z")->SetValue(tcasZ, 1);
-    datarefManager->GetDatarefByName("TCAS_PITCH")->SetValue(tcasPitch, 1);
-    datarefManager->GetDatarefByName("TCAS_ROLL")->SetValue(tcasHdg, 1);
-    datarefManager->GetDatarefByName("TCAS_HDG")->SetValue(tcasRoll, 1);
+OPERATION_API void UnregisterPlane(Message& message, Manager* manager)
+{
+    message.message["Result"] = "Ok";
+}
 
 
-    return;
+OPERATION_API void UpdatePlane(Message& message, Manager* manager)
+{
+    AircraftManager* aircraftManager = static_cast<AircraftManager*>(manager->GetService(NAMEOF(AircraftManager)));
+    int id = message.message["AircraftId"].get<int>();
+    Position p;
+    XPLMDataRef px = XPLMFindDataRef("sim/multiplayer/position/plane1_x");
+    XPLMDataRef py = XPLMFindDataRef("sim/multiplayer/position/plane1_y");
+    XPLMDataRef pz = XPLMFindDataRef("sim/multiplayer/position/plane1_z");
+    double oX = 0.0;
+    double oY = 0.0;
+    double oZ = 0.0;
+    p.Latitude  = message.message["Latitude"].get<double>();
+    p.Longitude = message.message["Longitude"].get<double>();
+    p.Elevation = message.message["Elevation"].get<double>();
+    p.Pitch     = message.message["Pitch"].get<double>();
+    p.Roll      = message.message["Roll"].get<double>();
+    p.Heading   = message.message["Heading"].get<double>();
+    XPLMWorldToLocal(p.Latitude, p.Longitude, p.Elevation, &oX, &oY, &oZ);
+
+    double oLat;
+    double oLon;
+    double oEle;
+
+    XPLMLocalToWorld(oX, oY, oZ, &oLat, &oLon, &oEle);
+
+
+    XPLMSetDatad(px, oX);
+    XPLMSetDatad(px, oY);
+    XPLMSetDatad(px, oZ);
+
+    double dataX = XPLMGetDatad(px);
+    double dataY = XPLMGetDatad(py);
+    double dataZ = XPLMGetDatad(pz);
+    //aircraftManager->UpdateAircraft(id, p);
+    message.message["Result"] = "Ok";
 }
