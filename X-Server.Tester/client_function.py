@@ -3,6 +3,7 @@ from udp_client_service import UDPClientService
 import time
 from varname import nameof
 from geographiclib.geodesic import Geodesic
+from threading import Thread
 
 CALLBACK_ID = 2847554231936
 def get_loaded_function(client: UDPClientService) ->None:
@@ -87,42 +88,67 @@ def set_plane_count(client: UDPClientService) -> None:
 
 def register_plane(client: UDPClientService) -> None:
     client.sendMessage({"Operation": "registerplane", "AircraftModel" : "E:\\X-Plane 11\\Aircraft\\Laminar Research\\Boeing B737-800\\b738.acf"})
+    # client.sendMessage({"Operation": "registerplane", "AircraftModel" :   "C:\\X-Plane 12\\Aircraft\\Laminar Research\\Boeing 737-800\\b738.acf"})
+
+def unregister_plane(client: UDPClientService) -> None:
+    client.sendMessage({"Operation": "unregisterplane", "AircraftId" : 1})
+
+def override_plane_on(client: UDPClientService) -> None:
+    client.sendMessage({"Operation": "overrideplanepath", "AircraftId" : 1, "Override" : 1})
+
+def override_plane_off(client: UDPClientService) -> None:
+    client.sendMessage({"Operation": "overrideplanepath", "AircraftId" : 1, "Override" : 0})
 
 def update_tcas(client: UDPClientService) -> None:
-    # velocity: float = 0
-    # velocity_max : float = 72.0
-    # elevation_max: float = 457.2
-    # acceleration: float = 2.0
-    # delta_time:float = 0.05
-    # # track:float = 255.0 
-    # while planes["Positions"][0]["Elevation"] < elevation_max:
-    #     if(velocity < velocity_max):
-    #         velocity = velocity + (acceleration * delta_time)
-    #     distance = velocity * delta_time
-    #     future = Geodesic.WGS84.Direct(planes["Positions"][0]["Latitude"], planes["Positions"][0]["Longitude"], planes["Positions"][0]["Heading"], distance)
-    #     planes["Positions"][0]["Latitude"] = future["lat2"]
-    #     planes["Positions"][0]["Longitude"] = future["lon2"]
-    #     if (velocity >= velocity_max):
-    #         planes["Positions"][0]["Elevation"] += (7.7 * delta_time)
-    #         planes["OnGround"][0] = 0
-    # for i in range(int(10.0 *  (1.0 / 0.05))):
-    client.sendMessage({"Operation": "updateplane",
+    plane = {"Operation": "updateplane",
                         "AircraftId" : 1,
                         "Latitude" : 51.203249,
                         "Longitude": 2.89623,
-                        "Elevation" : 5.256982,
+                        "Elevation" : 6.5,
                         "Pitch" : 0.0,
-                        "Heading" : 255.0,
-                        "Roll" : 0.0 })
-        # time.sleep(0.05)
+                        "Heading" : 256.0,
+                        "Roll" : 0.0,
+                        "VX" : 0.0,
+                        "VY" : 0.0,
+                        "VZ" : 0.0
+    }
+    client.sendMessage(plane)
+    # input("Press ENTER TO CONTINUE")
+    velocity: float = 0
+    velocity_max : float = 72.0
+    elevation_max: float = 457.2
+    acceleration: float = 2.0
+    delta_time:float = 0.01
+    track = math.radians(plane["Heading"])
+    # track:float = 255.0 
+    while plane["Elevation"] < elevation_max:
+        if(velocity < velocity_max):
+            velocity = velocity + (acceleration * delta_time)
+            plane["VX"] = math.cos(math.radians(plane["Heading"] - 90)) * velocity
+            plane["VY"] = 0.0
+            plane["VZ"] = math.sin(math.radians(plane["Heading"] - 90)) * velocity
+        if(plane["Pitch"] < 15 and velocity > velocity_max - 3.5):
+            plane["Pitch"] += 3 * delta_time
+        distance = velocity * delta_time
+        future = Geodesic.WGS84.Direct(plane["Latitude"], plane["Longitude"], plane["Heading"], distance)
+        plane["Latitude"] = future["lat2"]
+        plane["Longitude"] = future["lon2"]
+        if (velocity >= velocity_max):
+            plane["Elevation"] += (7.7 * delta_time)
+        client.sendMessage(plane)
+        time.sleep(delta_time)
+
+def do_update_tcas(client):
+    thread = Thread(target=update_tcas, args=[client,])
+    thread.start()
 
 def get_function_map() -> dict:
     return {
         nameof(load_operations_dll)  : load_operations_dll,           #0
         nameof(unload_operations_dll): unload_operations_dll,         #1
         # nameof(speak): speak,                                       #2
-        nameof(set_smoke_on): set_smoke_on,                           #3
-        nameof(set_smoke_off): set_smoke_off,                         #4
+        # nameof(set_smoke_on): set_smoke_on,                         #3
+        # nameof(set_smoke_off): set_smoke_off,                       #4
         # nameof(get_smoke_value): get_smoke_value,                   #5
         # nameof(register_dataref): register_dataref,                 #6
         # nameof(set_register_dataref_on): set_register_dataref_on,   #7
@@ -137,6 +163,9 @@ def get_function_map() -> dict:
         nameof(aquire_planes): aquire_planes,                         #16
         nameof(set_plane_count): set_plane_count,                     #17   
         nameof(register_plane): register_plane,                       #18   
-        nameof(release_planes): release_planes,                       #19 
-        nameof(update_tcas): update_tcas,                             #20   
+        nameof(unregister_plane): unregister_plane,                   #19  
+        nameof(release_planes): release_planes,                       #20 
+        nameof(update_tcas): do_update_tcas,                             #21  
+        nameof(override_plane_on): override_plane_on,                 #22 
+        nameof(override_plane_off): override_plane_off,               #23  
     }

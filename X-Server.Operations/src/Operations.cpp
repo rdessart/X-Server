@@ -40,24 +40,25 @@ OPERATION_API int GetOperations(std::map<std::string, std::string>* operationsNa
 {
     if (operationsNames == nullptr) return -1;
     size_t sizeBefore = operationsNames->size();
-    operationsNames->emplace("speak",           NAMEOF(SpeakOperation));
-    operationsNames->emplace("setdata",         NAMEOF(SetDatarefOperation));
-    operationsNames->emplace("getdata",         NAMEOF(GetDatarefOperation));
-    operationsNames->emplace("regdata",         NAMEOF(RegisterDatarefOperation));
-    operationsNames->emplace("setregdata",      NAMEOF(SetRegisteredDatarefOperation));
-    operationsNames->emplace("getregdata",      NAMEOF(GetRegisteredDatarefOperation));
-    operationsNames->emplace("datainfo",        NAMEOF(GetDatarefInfoOperation));
-    operationsNames->emplace("regdatainfo",     NAMEOF(GetRegisteredDatarefInfoOperation));
-    operationsNames->emplace("regflightloop",   NAMEOF(RegisterFlightLoopOperation));
-    operationsNames->emplace("subdata",         NAMEOF(SubscribeDatarefOperation));
-    operationsNames->emplace("unsubdata",       NAMEOF(UnsubscribeDatarefOperation));
-    operationsNames->emplace("unregflightloop", NAMEOF(UnregisterFlightLoopOperation));
-    operationsNames->emplace("aquireplanes",    NAMEOF(AquirePlanes));
-    operationsNames->emplace("releaseplanes",   NAMEOF(ReleasePlanes));
-    operationsNames->emplace("setplanecount",   NAMEOF(SetPlanesCount));
-    operationsNames->emplace("registerplane",   NAMEOF(RegisterPlane));
-    operationsNames->emplace("unregisterplane", NAMEOF(UnregisterPlane));
-    operationsNames->emplace("updateplane",     NAMEOF(UpdatePlane));
+    operationsNames->emplace("speak",            NAMEOF(SpeakOperation));
+    operationsNames->emplace("setdata",          NAMEOF(SetDatarefOperation));
+    operationsNames->emplace("getdata",          NAMEOF(GetDatarefOperation));
+    operationsNames->emplace("regdata",          NAMEOF(RegisterDatarefOperation));
+    operationsNames->emplace("setregdata",       NAMEOF(SetRegisteredDatarefOperation));
+    operationsNames->emplace("getregdata",       NAMEOF(GetRegisteredDatarefOperation));
+    operationsNames->emplace("datainfo",         NAMEOF(GetDatarefInfoOperation));
+    operationsNames->emplace("regdatainfo",      NAMEOF(GetRegisteredDatarefInfoOperation));
+    operationsNames->emplace("regflightloop",    NAMEOF(RegisterFlightLoopOperation));
+    operationsNames->emplace("subdata",          NAMEOF(SubscribeDatarefOperation));
+    operationsNames->emplace("unsubdata",        NAMEOF(UnsubscribeDatarefOperation));
+    operationsNames->emplace("unregflightloop",  NAMEOF(UnregisterFlightLoopOperation));
+    operationsNames->emplace("aquireplanes",     NAMEOF(AquirePlanes));
+    operationsNames->emplace("releaseplanes",    NAMEOF(ReleasePlanes));
+    operationsNames->emplace("setplanecount",    NAMEOF(SetPlanesCount));
+    operationsNames->emplace("registerplane",    NAMEOF(RegisterPlane));
+    operationsNames->emplace("unregisterplane",  NAMEOF(UnregisterPlane));
+    operationsNames->emplace("updateplane",      NAMEOF(UpdatePlane));
+    operationsNames->emplace("overrideplanepath",NAMEOF(OverridePlanePath));
     return (int)(operationsNames->size() - sizeBefore);
 }
 
@@ -419,43 +420,38 @@ OPERATION_API void RegisterPlane(Message& message, Manager* manager)
 
 OPERATION_API void UnregisterPlane(Message& message, Manager* manager)
 {
+    int id = message.message["AircraftId"].get<int>();
+    AircraftManager* aircraftManager = static_cast<AircraftManager*>(manager->GetService(NAMEOF(AircraftManager)));
+    aircraftManager->DeleteAircraft(id);
     message.message["Result"] = "Ok";
 }
-
 
 OPERATION_API void UpdatePlane(Message& message, Manager* manager)
 {
     AircraftManager* aircraftManager = static_cast<AircraftManager*>(manager->GetService(NAMEOF(AircraftManager)));
     int id = message.message["AircraftId"].get<int>();
     Position p;
-    XPLMDataRef px = XPLMFindDataRef("sim/multiplayer/position/plane1_x");
-    XPLMDataRef py = XPLMFindDataRef("sim/multiplayer/position/plane1_y");
-    XPLMDataRef pz = XPLMFindDataRef("sim/multiplayer/position/plane1_z");
-    double oX = 0.0;
-    double oY = 0.0;
-    double oZ = 0.0;
     p.Latitude  = message.message["Latitude"].get<double>();
     p.Longitude = message.message["Longitude"].get<double>();
     p.Elevation = message.message["Elevation"].get<double>();
-    p.Pitch     = message.message["Pitch"].get<double>();
-    p.Roll      = message.message["Roll"].get<double>();
-    p.Heading   = message.message["Heading"].get<double>();
-    XPLMWorldToLocal(p.Latitude, p.Longitude, p.Elevation, &oX, &oY, &oZ);
 
-    double oLat;
-    double oLon;
-    double oEle;
+    p.Pitch     = message.message.value("Pitch", 0.0f);
+    p.Roll      = message.message.value("Roll", 0.0f);
+    p.Heading   = message.message.value("Heading", 0.0f);
 
-    XPLMLocalToWorld(oX, oY, oZ, &oLat, &oLon, &oEle);
+    p.Vx        = message.message.value("VX", 0.0f);
+    p.Vy      = message.message.value("VY", 0.0f);
+    p.Vz        = message.message.value("VZ", 0.0f);
 
+    aircraftManager->UpdateAircraft(id, p);
+    message.message["Result"] = "Ok";
+}
 
-    XPLMSetDatad(px, oX);
-    XPLMSetDatad(px, oY);
-    XPLMSetDatad(px, oZ);
-
-    double dataX = XPLMGetDatad(px);
-    double dataY = XPLMGetDatad(py);
-    double dataZ = XPLMGetDatad(pz);
-    //aircraftManager->UpdateAircraft(id, p);
+OPERATION_API void OverridePlanePath(Message& message, Manager* manager)
+{
+    int id = message.message["AircraftId"].get<int>();
+    int value = message.message["Override"].get<int>();
+    AircraftManager* aircraftManager = static_cast<AircraftManager*>(manager->GetService(NAMEOF(AircraftManager)));
+    aircraftManager->SetOverridePlanePath(id, value);
     message.message["Result"] = "Ok";
 }
