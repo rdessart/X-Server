@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE debug)
+set(CMAKE_OSX_ARCHITECTURES "x86_64")
 project("XServer" VERSION 1.0.0 LANGUAGES C CXX)
 
 # target_link_libraries(TimedProcessing "-framework XPLM")
@@ -42,7 +43,7 @@ target_link_libraries(
 get_test_property(XServer WORKING_DIRECTORY test_dir)
 message("My test's working directory: ${test_dir}")
 
-set_target_properties(XServer PROPERTIES LINK_FLAGS "-Wl,-F ../../SDK/Libraries/Mac/ -fPIC -fvisibility=hidden")
+set_target_properties(XServer PROPERTIES LINK_FLAGS "-Wl,-F ../SDK/Libraries/Mac/ -fPIC -fvisibility=hidden")
 set_target_properties(XServer PROPERTIES OUTPUT_NAME "XServer")
 set_target_properties(XServer PROPERTIES PREFIX "")
 set_target_properties(XServer PROPERTIES SUFFIX ".xpl")
