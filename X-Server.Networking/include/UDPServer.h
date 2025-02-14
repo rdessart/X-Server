@@ -22,7 +22,7 @@ protected:
 	SOCKET _socket = INVALID_SOCKET;
     Logger m_logger = Logger("X-Server.log", "UDPBeacon", true);
     struct addrinfo* _targetAddress = nullptr;
-    fd_set master;
+    fd_set m_master;
     SOCKET m_maxSocket = INVALID_SOCKET;
     std::queue<Message> m_messageQueue;
 };

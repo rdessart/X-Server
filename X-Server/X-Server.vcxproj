@@ -71,24 +71,24 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(xplane)Resources\plugins\XServer\</OutDir>
+    <OutDir>$(xplane)\Resources\plugins\XServer\</OutDir>
     <TargetName>win</TargetName>
     <TargetExt>.xpl</TargetExt>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(xplane)Resources\plugins\XServer\</OutDir>
+    <OutDir>$(xplane)\Resources\plugins\XServer\</OutDir>
     <TargetName>win</TargetName>
     <TargetExt>.xpl</TargetExt>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(xplane)Resources\plugins\XServer\64\</OutDir>
+    <OutDir>$(xplane)\Resources\plugins\XServer\64\</OutDir>
     <TargetName>win</TargetName>
     <TargetExt>.xpl</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(xplane)Resources\plugins\XServer\64\</OutDir>
+    <OutDir>$(xplane)\Resources\plugins\XServer\64\</OutDir>
     <TargetName>win</TargetName>
     <TargetExt>.xpl</TargetExt>
   </PropertyGroup>

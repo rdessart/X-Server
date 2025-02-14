@@ -1,6 +1,6 @@
 #include "../include/UDPServer.h"
 
-UDPServer::UDPServer()
+UDPServer::UDPServer() : m_master({0})
 {
 }
 
@@ -30,16 +30,18 @@ int UDPServer::Initalize()
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_flags = AI_PASSIVE;
     struct addrinfo* bindAddress;
-    getaddrinfo("0.0.0.0", "50555", &hints, &bindAddress);
-    getaddrinfo("127.0.0.1", "50556", &hints, &_targetAddress);
+    getaddrinfo("0.0.0.0", "50001", &hints, &bindAddress);
+    getaddrinfo("127.0.0.1", "50002", &hints, &_targetAddress);
     if (bind(_socket, bindAddress->ai_addr, static_cast<int>(bindAddress->ai_addrlen)))
     {
-        m_logger.Log("Unable to bind on 0.0.0.0:50555");
+        m_logger.Log("Unable to bind on 0.0.0.0:55001");
+        int error = GETSOCKETERRNO();
+        m_logger.Log("Error: " + std::to_string(error));
         return 0x03;
     }
     freeaddrinfo(bindAddress);
-    FD_ZERO(&master);
-    FD_SET(_socket, &master);
+    FD_ZERO(&m_master);
+    FD_SET(_socket, &m_master);
     m_maxSocket = _socket;
     return 0x00;
 }
@@ -61,7 +63,7 @@ int UDPServer::SendData(Message message)
 void UDPServer::ReceiveMessage()
 {
     fd_set read;
-    read = master;
+    read = m_master;
     while (1)
     {
         int res = select(static_cast<int>(m_maxSocket) + 1, &read, 0, 0, nullptr);

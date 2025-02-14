@@ -7,8 +7,8 @@ UDPBeacon::UDPBeacon()
     ip.str_ip = "127.0.0.1";
     ip.str_subnet = "255.255.255.0";
     m_ip = ip;
-    m_listeningPort = 50555;
-    m_broacastPort = 50888;
+    m_listeningPort = 50001;
+    m_broacastPort = 50003;
 }
 
 UDPBeacon::UDPBeacon(IPInfo ip, int broadcastPort, int listeningPort)

@@ -32,7 +32,7 @@ std::map<int, IPInfo> IPMap;
 static UDPBeacon beacon;
 static XPLMFlightLoopID initalizerCallbackId;
 static XPLMFlightLoopID beaconCallbackId;
-static Logger logger("X-Server.log", "MAIN", false);
+static Logger logger("X-Server.log", "MAIN", true);
 static std::thread BeaconThread;
 static std::string AcfAuthor;
 static std::string AcfDescription;
@@ -94,6 +94,9 @@ PLUGIN_API void XPluginDisable(void)
 
 PLUGIN_API int XPluginEnable(void)
 {
+	int res = manager.GetServer()->Initalize();
+	if (res != 0)
+		return 0;
 	return 1;
 }
 
@@ -141,7 +144,7 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 	logger.Log("UDP Beacon initalizer returned " + std::to_string(res));
 	XPLMScheduleFlightLoop(beaconCallbackId, -1, 0);
 
-	res = manager.GetServer()->Initalize();
+	
 	manager.GetLogger()->Log("UDP Server initalizer returned " + std::to_string(res));
 	
 	auto futptr = std::make_shared<std::future<void>>();
