@@ -28,7 +28,9 @@ include_directories(
 
 add_definitions(-DXPLM200=1 -DXPLM210=1 -DXPLM300=1 -DXPLM301=1 -DXPLM303=1 -DXPLM400=1 -DAPL=1)
 
-add_library(XServer SHARED Sources/main.cpp)
+file(GLOB_RECURSE SOURCES src/*.cpp src/*.h include/*.cpp include/*.h)
+
+add_library(XServer SHARED  ${SOURCES})
 
 # link_directories("../lib/")
 
@@ -42,7 +44,7 @@ target_link_libraries(
 get_test_property(XServer WORKING_DIRECTORY test_dir)
 message("My test's working directory: ${test_dir}")
 
-set_target_properties(XServer PROPERTIES LINK_FLAGS "-Wl,-F ../SDK/Libraries/Mac/ -fPIC -fvisibility=hidden")
+set_target_properties(XServer PROPERTIES LINK_FLAGS "-Wl,-F ../../SDK/Libraries/Mac/ -fPIC -fvisibility=hidden")
 set_target_properties(XServer PROPERTIES OUTPUT_NAME "XServer")
 set_target_properties(XServer PROPERTIES PREFIX "")
 set_target_properties(XServer PROPERTIES SUFFIX ".xpl")

@@ -12,23 +12,9 @@ include_directories(
 
 add_definitions(-DXPLM200=1 -DXPLM210=1 -DXPLM300=1 -DXPLM301=1 -DXPLM303=1 -DXPLM400=1 -DAPL=1)
 
-add_library(Manager 
-   src/MasterCallback.cpp
-   src/Datarefs/Dataref.cpp
-   src/Datarefs/FFA320Dataref.cpp
-   src/Managers/OperationManager.cpp
-   src/Tools/Utils.cpp
-   src/Manager.cpp
+file(GLOB_RECURSE SOURCES src/*.cpp src/*.h include/*.cpp include/*.h)
 
-   include/MasterCallback.h
-   include/Datarefs/AbstractDataref.h
-   include/Datarefs/Dataref.h
-   include/Datarefs/FFA320Dataref.h
-   include/Managers/OperationManager.h
-   include/Tools/Utils.h
-   include/Tools/SharedValue.h
-   include/Manager.h
-)
+add_library(Manager ${SOURCES} )
 
 set_target_properties(Manager
     PROPERTIES

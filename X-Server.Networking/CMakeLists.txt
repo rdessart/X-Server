@@ -6,16 +6,9 @@ project("Networking" VERSION 1.0.0 LANGUAGES C CXX)
 
 include_directories(../X-Server.Logging/include ~/vcpkg/installed/arm64-osx/include/)
 
-add_library(Networking 
-    src/NetworkUtils.cpp 
-    src/UDPBeacon.cpp 
-    src/UDPServer.cpp 
-    include/IServer.h 
-    include/UDPServer.h 
-    include/Message.h 
-    include/NetworkUtils.h 
-    include/UDPBeacon.h
-)
+file(GLOB_RECURSE SOURCES src/*.cpp src/*.h include/*.cpp include/*.h)
+
+add_library(Networking  ${SOURCES} )
 
 set_target_properties(Networking
     PROPERTIES

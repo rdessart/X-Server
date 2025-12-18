@@ -4,7 +4,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE debug)
 project("Logger" VERSION 1.0.0 LANGUAGES C CXX)
 
-add_library(Logger src/Logger.cpp include/Logger.h)
+file(GLOB_RECURSE SOURCES src/*.cpp src/*.h include/*.cpp include/*.h)
+
+add_library(Logger  ${SOURCES})
 
 set_target_properties(Logger
     PROPERTIES
