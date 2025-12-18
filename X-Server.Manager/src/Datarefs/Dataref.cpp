@@ -196,13 +196,13 @@ void Dataref::SetValue(json value, int offset) const
 	}
 	case Dataref::Type::FloatArray:
 	{
-		m_logger.Log("Dataref is of type floatarray", Logger::Severity::WARNING);
+		m_logger.Log("Dataref is of type floatarray", Logger::Severity::TRACE);
 		int res = this->setFloatArrayFromJson(offset, value);
 		break;
 	}
 	case Dataref::Type::IntArray:
 	{
-		m_logger.Log("Dataref is of type intarray", Logger::Severity::WARNING);
+		m_logger.Log("Dataref is of type intarray", Logger::Severity::TRACE);
 		int res = this->setIntArrayFromJson(offset, value);
 		break;
 	}
@@ -235,63 +235,6 @@ void Dataref::SetConversionFactor(json conversionFactor)
 
 int Dataref::setFloatArrayFromJson(int offset, json value) const
 {
-	//std::vector<float> data;
-	//int maxSize = XPLMGetDatavf(m_dataref, nullptr, 0, 0);
-	//int f_offset(offset);
-	//if (value.type() == json::value_t::discarded)
-	//{
-	//	m_logger.Log("FloatArray : json parsing of value failed!", Logger::Severity::CRITICAL);
-	//	return -1;
-	//}
-	//else if (value.type() == json::value_t::array)
-	//{
-	//	if ((int)value.size() < maxSize)
-	//		maxSize = (int)value.size();
-	//	m_logger.Log("FloatArray : max size is " + std::to_string(maxSize), Logger::Severity::CRITICAL);
-	//	std::vector<float> valArray = value.get<std::vector<float>>();
-	//	for (auto& val : valArray)
-	//	{
-	//		data.push_back(val / (float)m_conversionFactor);
-	//	}
-	//}
-	//else if (value.type() == json::value_t::string || value.type() == json::value_t::number_float)
-	//{
-	//	if (value.type() == json::value_t::number_float)
-	//	{
-	//		for (int i(0); i < maxSize; i++)
-	//		{
-	//			data.push_back(value.get<float>() / (float)m_conversionFactor);
-	//		}
-	//	}
-	//}
-	//else if (value.type() == json::value_t::object)
-	//{
-	//	if (!value.contains("Value"))
-	//	{
-	//		m_logger.Log("FloatArray : json is not an array and doesn't contain a Value field", Logger::Severity::CRITICAL);
-	//		return -2;
-	//	}
-	//	if (value.contains("Offset"))
-	//	{
-	//		if (value["Offset"].type() == json::value_t::string)
-	//		{
-	//			f_offset = value["Offset"].get<int>() / (int)m_conversionFactor;
-	//		}
-	//		else
-	//		{
-	//			m_logger.Log("FloatArray : Offset field exist but is not string... skipping", Logger::Severity::WARNING);
-	//			f_offset = 0;
-	//		}
-	//	}
-	//	return setFloatArrayFromJson(f_offset, value["Value"].dump());
-	//}
-	//else {
-	//	m_logger.Log("FloatArray: JSON type is unknown", Logger::Severity::CRITICAL);
-	//	return 0x02;
-	//}
-	//data.resize(maxSize);
-	//XPLMSetDatavf(m_dataref, data.data(), offset, maxSize);
-	//return EXIT_SUCCESS;
 	int maxSize = XPLMGetDatavf(m_dataref, nullptr, 0, 0);
 	std::vector<float> values = value.get<std::vector<float>>();
 	if (maxSize > static_cast<int>(values.size())) maxSize = static_cast<int>(value.size());
