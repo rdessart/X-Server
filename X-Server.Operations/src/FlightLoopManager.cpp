@@ -81,7 +81,7 @@ bool FlightLoopManager::UnassignDatarefToFlightLoop(XPLMFlightLoopID flightloopI
 	}
 	if (found)
 	{
-		delete it->second;
+		//delete it->second;
 		m_flightLoopsDatarefs[flightloopId].erase(it);
 	}
 	return found;
@@ -108,7 +108,7 @@ bool FlightLoopManager::DeleteFlightLoop(XPLMFlightLoopID flightloopId)
 		{
 			while (it->second.size() > 0)
 			{
-				delete it->second.begin()->second;
+				//delete it->second.begin()->second;
 				it->second.erase(it->second.begin());
 			}
 			m_flightLoopsDatarefs.erase(it);
