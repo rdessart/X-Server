@@ -119,10 +119,10 @@ static float InitalizerCallback(float elapsed, float elpasedFlightLoop, int coun
 	d2.SetType(Dataref::Type::Data);
 
 	std::vector<IPInfo> ips = FindIp();
-	char menuId = 0;
+	int menuId = 0;
 	for (auto& ip : ips)
 	{
-		int res = XPLMAppendMenuItem(eSkyInstructorMenu, ip.str_ip.c_str(), (void*)menuId, 0);
+		int res = XPLMAppendMenuItem(eSkyInstructorMenu, ip.str_ip.c_str(), &menuId, 0);
 		if (res < 0)
 		{
 			logger.Log("Unable to add IP : '" + ip.str_ip + "' to menu");
