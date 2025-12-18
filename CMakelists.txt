@@ -4,9 +4,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE debug)
 set(CMAKE_TOOLCHAIN_FILE "/Users/rdessart/vcpkg/scripts/buildsystems/vcpkg.cmake")
 
+project("XServer" VERSION 1.0.0 LANGUAGES C CXX)
+
 add_subdirectory("./X-Server.Logging")
 add_subdirectory("./X-Server.Networking")
 add_subdirectory("./X-Server.Manager")
-add_subdirectory("./X-Server")
 add_subdirectory("./X-Server.Operations")
-add_subdirectory("./X-Server.Operations.Beta")
+add_subdirectory("./X-Server")
+# add_subdirectory("./X-Server.Operations.Beta")
+
+# project("Xplane")
